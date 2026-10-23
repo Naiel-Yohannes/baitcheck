@@ -173,6 +173,35 @@ export const strings = {
     // ── Report page — degraded notice ────────────────────────────
     reportDegradedNotice: 'Some evaluations were unavailable. The score shown may be incomplete.',
 
+    // ── History page ──────────────────────────────────────────────
+    historyLoading: 'Loading your history…',
+    historyEmpty: 'You do not have any sessions yet.',
+    historyBrowseScenarios: 'Browse scenarios',
+    historyLanguage: 'Language',
+    historyCreated: 'Created',
+    historyResult: 'Result',
+    historyNoFinalScore: 'No final score yet',
+    historyViewReport: 'View report',
+    historyContinue: 'Continue',
+
+    // ── Admin page ────────────────────────────────────────────────
+    adminLoading: 'Loading organization summary…',
+    adminEmpty: 'Organization data is not available.',
+    adminJoinCodeHelp: 'Employees can use this code to join your organization.',
+    adminCopyCode: 'Copy code',
+    adminCopied: 'Copied',
+    adminOrganizationStats: 'Organization statistics',
+    adminAverageScore: 'Average score',
+    adminNoData: 'No data yet',
+    adminCompletedSessions: 'Completed sessions',
+    adminEmployeeCount: 'Employees',
+    adminEmployees: 'Employees',
+    adminNoEmployees: 'No employees have joined yet.',
+    adminEmployeeName: 'Name',
+    adminSessionsCompleted: 'Sessions completed',
+    adminLastActivity: 'Last activity',
+    adminNoCompletedSessions: 'No completed sessions yet',
+
     // ── Report page — checkpoints section ────────────────────────
     reportCheckpoints:       'Checkpoints',
     checkpointPassed:        'Passed',
@@ -354,6 +383,35 @@ export const strings = {
 
     // ── Report page — degraded notice ────────────────────────────
     reportDegradedNotice: 'አንዳንድ ግምገማዎች አልተደረሱም። የሚታየው ውጤት ሙሉ ላይሆን ይችላል።',
+
+    // ── History page ──────────────────────────────────────────────
+    historyLoading: 'የታሪክ መረጃዎ በመጫን ላይ…',
+    historyEmpty: 'እስካሁን ምንም ክፍለ ጊዜ የለዎትም።',
+    historyBrowseScenarios: 'ሁኔታዎችን ይመልከቱ',
+    historyLanguage: 'ቋንቋ',
+    historyCreated: 'የተፈጠረበት ቀን',
+    historyResult: 'ውጤት',
+    historyNoFinalScore: 'የመጨረሻ ውጤት ገና የለም',
+    historyViewReport: 'ሪፖርት ይመልከቱ',
+    historyContinue: 'ቀጥል',
+
+    // ── Admin page ────────────────────────────────────────────────
+    adminLoading: 'የድርጅቱ ማጠቃለያ በመጫን ላይ…',
+    adminEmpty: 'የድርጅቱ መረጃ አልተገኘም።',
+    adminJoinCodeHelp: 'ሠራተኞች ድርጅትዎን ለመቀላቀል ይህን ኮድ መጠቀም ይችላሉ።',
+    adminCopyCode: 'ኮድ ቅዳ',
+    adminCopied: 'ተቀድቷል',
+    adminOrganizationStats: 'የድርጅቱ ስታቲስቲክስ',
+    adminAverageScore: 'አማካይ ውጤት',
+    adminNoData: 'እስካሁን መረጃ የለም',
+    adminCompletedSessions: 'የተጠናቀቁ ክፍለ ጊዜዎች',
+    adminEmployeeCount: 'ሠራተኞች',
+    adminEmployees: 'ሠራተኞች',
+    adminNoEmployees: 'እስካሁን ምንም ሠራተኞች አልተቀላቀሉም።',
+    adminEmployeeName: 'ስም',
+    adminSessionsCompleted: 'የተጠናቀቁ ክፍለ ጊዜዎች',
+    adminLastActivity: 'የመጨረሻ እንቅስቃሴ',
+    adminNoCompletedSessions: 'ገና የተጠናቀቁ ክፍለ ጊዜዎች የሉም',
 
     // ── Report page — checkpoints section ────────────────────────
     reportCheckpoints:       'የፍተሻ ነጥቦች',
