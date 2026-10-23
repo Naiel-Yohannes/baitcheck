@@ -55,6 +55,13 @@ export const strings = {
     chatMessageLabel: 'Your message',
     chatMessagePlaceholder: 'Write your message…',
     chatSend: 'Send',
+    chatEndSession: 'End session',
+    chatEndSessionHint: 'Send at least one message before ending.',
+    chatConfirmEnd: 'End this session and see your report?',
+    chatConfirm: 'Confirm',
+    chatCancel: 'Cancel',
+    chatPreparingReport: 'Preparing your report. This can take a few seconds.',
+    chatTryAgain: 'Try again',
 
     // ── Auth / status UI ─────────────────────────────────────────
     statusLoading:          'Loading…',
@@ -190,6 +197,13 @@ export const strings = {
     chatMessageLabel: 'የእርስዎ መልዕክት',
     chatMessagePlaceholder: 'መልዕክትዎን ይጻፉ…',
     chatSend: 'ላክ',
+    chatEndSession: 'ክፍለ ጊዜውን ጨርስ',
+    chatEndSessionHint: 'ከመጨረስዎ በፊት ቢያንስ አንድ መልዕክት ይላኩ።',
+    chatConfirmEnd: 'ይህን ክፍለ ጊዜ ጨርሰው ሪፖርትዎን ማየት ይፈልጋሉ?',
+    chatConfirm: 'አረጋግጥ',
+    chatCancel: 'ሰርዝ',
+    chatPreparingReport: 'ሪፖርትዎን እያዘጋጀን ነው። ይህ ጥቂት ሰከንዶች ሊወስድ ይችላል።',
+    chatTryAgain: 'እንደገና ሞክር',
 
     // ── Auth / status UI ─────────────────────────────────────────
     statusLoading:          'በመጫን ላይ…',
