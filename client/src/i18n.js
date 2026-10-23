@@ -27,6 +27,20 @@ export const strings = {
     headingHistory:   'History',
     headingAdmin:     'Admin',
 
+    // ── Scenarios page ────────────────────────────────────────────
+    scenarioLoading: 'Loading scenarios…',
+    scenarioEmpty: 'No scenarios are available right now.',
+    scenarioStart: 'Start',
+    scenarioStarting: 'Starting…',
+    scenarioAboutMinutes: 'About {minutes} min',
+    scenarioChooseLanguage: 'Choose a language',
+    scenarioLanguageEnglish: 'EN',
+    scenarioLanguageAmharic: 'አማርኛ',
+    scenarioLanguageUnavailable: 'Not available in this language yet.',
+    scenarioChannelCall: 'Call',
+    scenarioChannelTelegram: 'Telegram',
+    scenarioChannelMessage: 'Message',
+
     // ── Auth / status UI ─────────────────────────────────────────
     statusLoading:          'Loading…',
     errorCannotReachServer: 'Cannot reach the server. Please check your connection.',
@@ -132,6 +146,20 @@ export const strings = {
     headingReport:    'ሪፖርት',
     headingHistory:   'ታሪክ',
     headingAdmin:     'አስተዳዳሪ',
+
+    // ── Scenarios page ────────────────────────────────────────────
+    scenarioLoading: 'ሁኔታዎች በመጫን ላይ…',
+    scenarioEmpty: 'አሁን ምንም ሁኔታዎች የሉም።',
+    scenarioStart: 'ጀምር',
+    scenarioStarting: 'በመጀመር ላይ…',
+    scenarioAboutMinutes: 'ወደ {minutes} ደቂቃ',
+    scenarioChooseLanguage: 'ቋንቋ ይምረጡ',
+    scenarioLanguageEnglish: 'EN',
+    scenarioLanguageAmharic: 'አማርኛ',
+    scenarioLanguageUnavailable: 'ይህ ቋንቋ ገና አይገኝም።',
+    scenarioChannelCall: 'ስልክ ጥሪ',
+    scenarioChannelTelegram: 'ቴሌግራም',
+    scenarioChannelMessage: 'መልዕክት',
 
     // ── Auth / status UI ─────────────────────────────────────────
     statusLoading:          'በመጫን ላይ…',
