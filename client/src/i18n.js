@@ -61,6 +61,55 @@ export const strings = {
     error_NETWORK_ERROR:      'Could not connect to the server. Check your internet connection.',
     // Generic fallback (unknown code)
     errorGeneric:             'Something went wrong. Please try again.',
+
+    // ── Shared form elements ──────────────────────────────────────
+    fieldEmail:             'Email address',
+    fieldPassword:          'Password',
+    fieldName:              'Full name',
+    actionSubmit:           'Submit',
+    statusPleaseWait:       'Please wait…',
+
+    // ── Validation messages ───────────────────────────────────────
+    validEmailRequired:     'Please enter a valid email address.',
+    validPasswordRequired:  'Password must be at least 8 characters.',
+    validPasswordTooLong:   'Password must be 72 characters or fewer.',
+    validNameRequired:      'Name must be at least 2 characters.',
+    validNameTooLong:       'Name must be 60 characters or fewer.',
+    validFieldInvalid:      'This field is invalid.',
+
+    // ── Login page ────────────────────────────────────────────────
+    loginSubmit:            'Log in',
+    loginNoAccount:         'No account?',
+    loginRegisterLink:      'Register',
+
+    // ── Register page — account type selector ─────────────────────
+    registerTypeIndividual: 'Individual',
+    registerTypeCreate:     'Create organization',
+    registerTypeJoin:       'Join organization',
+
+    // ── Register page — fields ────────────────────────────────────
+    fieldOrgName:           'Organization name',
+    fieldJoinCode:          'Join code',
+
+    // ── Register page — field validation ─────────────────────────
+    validOrgNameRequired:   'Organization name must be at least 2 characters.',
+    validOrgNameTooLong:    'Organization name must be 60 characters or fewer.',
+    validJoinCodeRequired:  'Join code must be exactly 6 characters.',
+
+    // ── Register page — submit ────────────────────────────────────
+    registerSubmit:         'Create account',
+    registerHaveAccount:    'Already have an account?',
+    registerLoginLink:      'Log in',
+
+    // ── Register success panel (orgAdmin) ─────────────────────────
+    registerSuccessHeading: 'Organization created!',
+    registerSuccessBody:    'Share this code with your employees so they can join your organization:',
+    registerCopyCode:       'Copy code',
+    registerCopied:         'Copied!',
+    registerContinue:       'Continue to Scenarios',
+
+    // ── Demo notice ───────────────────────────────────────────────
+    demoNotice: 'Demo notice: chats may be processed and reviewed by the AI provider. Do not share anything private.',
   },
 
   am: {
@@ -107,5 +156,54 @@ export const strings = {
     error_SERVER_ERROR:       'ያልተጠበቀ የአገልጋይ ስህተት ተፈጥሯል።',
     error_NETWORK_ERROR:      'ከአገልጋዩ ጋር ግንኙነት ማድረግ አልተቻለም። የኢንተርኔት ግንኙነትዎን ያረጋግጡ።',
     errorGeneric:             'ችግር ተፈጥሯል። እንደገና ይሞክሩ።',
+
+    // ── Shared form elements ──────────────────────────────────────
+    fieldEmail:             'ኢሜይል አድራሻ',
+    fieldPassword:          'የይለፍ ቃል',
+    fieldName:              'ሙሉ ስም',
+    actionSubmit:           'አስገባ',
+    statusPleaseWait:       'እባክዎ ይጠብቁ…',
+
+    // ── Validation messages ───────────────────────────────────────
+    validEmailRequired:     'እባክዎ ትክክለኛ ኢሜይል አድራሻ ያስገቡ።',
+    validPasswordRequired:  'የይለፍ ቃሉ ቢያንስ 8 ቁምፊዎች መሆን አለበት።',
+    validPasswordTooLong:   'የይለፍ ቃሉ ከ72 ቁምፊዎች ማለፍ የለበትም።',
+    validNameRequired:      'ስሙ ቢያንስ 2 ቁምፊዎች መሆን አለበት።',
+    validNameTooLong:       'ስሙ ከ60 ቁምፊዎች ማለፍ የለበትም።',
+    validFieldInvalid:      'ይህ መስክ ልክ አይደለም።',
+
+    // ── Login page ────────────────────────────────────────────────
+    loginSubmit:            'ግባ',
+    loginNoAccount:         'መለያ የለዎትም?',
+    loginRegisterLink:      'ተመዝገብ',
+
+    // ── Register page — account type selector ─────────────────────
+    registerTypeIndividual: 'ግለሰብ',
+    registerTypeCreate:     'ድርጅት ፍጠር',
+    registerTypeJoin:       'ድርጅት ተቀላቀል',
+
+    // ── Register page — fields ────────────────────────────────────
+    fieldOrgName:           'የድርጅት ስም',
+    fieldJoinCode:          'የመቀላቀያ ኮድ',
+
+    // ── Register page — field validation ─────────────────────────
+    validOrgNameRequired:   'የድርጅት ስም ቢያንስ 2 ቁምፊዎች መሆን አለበት።',
+    validOrgNameTooLong:    'የድርጅት ስም ከ60 ቁምፊዎች ማለፍ የለበትም።',
+    validJoinCodeRequired:  'የመቀላቀያ ኮድ ትክክለኛ 6 ቁምፊዎች መሆን አለበት።',
+
+    // ── Register page — submit ────────────────────────────────────
+    registerSubmit:         'መለያ ፍጠር',
+    registerHaveAccount:    'አስቀድሞ መለያ አለዎት?',
+    registerLoginLink:      'ግባ',
+
+    // ── Register success panel (orgAdmin) ─────────────────────────
+    registerSuccessHeading: 'ድርጅቱ ተፈጥሯል!',
+    registerSuccessBody:    'ሠራተኞችዎ ድርጅቱን እንዲቀላቀሉ ይህን ኮድ ያጋሩ:',
+    registerCopyCode:       'ኮድ ቅዳ',
+    registerCopied:         'ተቀድቷል!',
+    registerContinue:       'ወደ ሁኔታዎች ቀጥል',
+
+    // ── Demo notice ───────────────────────────────────────────────
+    demoNotice: 'የማሳያ ማስታወቂያ: ቻቶች በ AI አቅራቢ ሊቀናበሩ እና ሊገመገሙ ይችላሉ። ግላዊ መረጃ አያጋሩ።',
   },
 }
