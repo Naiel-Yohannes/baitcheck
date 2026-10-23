@@ -146,6 +146,57 @@ export const strings = {
 
     // ── Demo notice ───────────────────────────────────────────────
     demoNotice: 'Demo notice: chats may be processed and reviewed by the AI provider. Do not share anything private.',
+
+    // ── Report page — loading / error states ─────────────────────
+    reportLoading:        'Loading report…',
+    reportNotAvailable:   'Report not available yet. The session may still be processing.',
+    reportNotFound:       'This session could not be found.',
+    reportGoToScenarios:  'Go to Scenarios',
+
+    // ── Report page — header ──────────────────────────────────────
+    reportScoreOutOf:     '/ 100',
+    reportLanguageEnglish: 'English',
+    reportLanguageAmharic: 'አማርኛ',
+
+    // ── Report page — end reason ──────────────────────────────────
+    reportEndReason_user_button:      'Ended by you',
+    reportEndReason_end_signal:       'Scenario ended',
+    reportEndReason_max_turns:        'Maximum turns reached',
+    reportEndReason_scenario_complete:'Scenario complete',
+
+    // ── Report page — band labels ─────────────────────────────────
+    bandVulnerable: 'Vulnerable',
+    bandPartial:    'Partly resilient',
+    bandResilient:  'Resilient',
+    bandStrong:     'Strong',
+
+    // ── Report page — degraded notice ────────────────────────────
+    reportDegradedNotice: 'Some evaluations were unavailable. The score shown may be incomplete.',
+
+    // ── Report page — checkpoints section ────────────────────────
+    reportCheckpoints:       'Checkpoints',
+    checkpointPassed:        'Passed',
+    checkpointFailed:        'Failed',
+    checkpointNa:            'Not applicable',
+    checkpointUnjudged:      'Could not evaluate',
+    checkpointNaNote:        'Not applicable: this part of the scenario was not reached.',
+    checkpointUnjudgedNote:  'Could not be evaluated. This is not counted as a failure.',
+    checkpointYourMessage:   'Your message:',
+
+    // ── Report page — timeline section ───────────────────────────
+    reportTimeline:       'Technique timeline',
+    reportOpeningMessage: 'Opening message',
+    reportFromTurn:       'From turn {n}',
+
+    // ── Report page — feedback section ───────────────────────────
+    reportFeedback:   'Feedback',
+    feedbackDidWell:  'What you did well',
+    feedbackImprove:  'What to improve',
+    feedbackNextTime: 'What to do next time',
+
+    // ── Report page — footer actions ──────────────────────────────
+    reportTryAnother: 'Try another scenario',
+    reportMyHistory:  'My history',
   },
 
   am: {
@@ -277,5 +328,56 @@ export const strings = {
 
     // ── Demo notice ───────────────────────────────────────────────
     demoNotice: 'የማሳያ ማስታወቂያ: ቻቶች በ AI አቅራቢ ሊቀናበሩ እና ሊገመገሙ ይችላሉ። ግላዊ መረጃ አያጋሩ።',
+
+    // ── Report page — loading / error states ─────────────────────
+    reportLoading:        'ሪፖርቱ በመጫን ላይ…',
+    reportNotAvailable:   'ሪፖርቱ ገና አልተዘጋጀም። ክፍለ ጊዜው አሁንም እየተሰራ ሊሆን ይችላል።',
+    reportNotFound:       'ይህ ክፍለ ጊዜ አልተገኘም።',
+    reportGoToScenarios:  'ወደ ሁኔታዎች ሂድ',
+
+    // ── Report page — header ──────────────────────────────────────
+    reportScoreOutOf:     '/ 100',
+    reportLanguageEnglish: 'እንግሊዝኛ',
+    reportLanguageAmharic: 'አማርኛ',
+
+    // ── Report page — end reason ──────────────────────────────────
+    reportEndReason_user_button:      'በእርስዎ ተጠናቋል',
+    reportEndReason_end_signal:       'ሁኔታው ተጠናቋል',
+    reportEndReason_max_turns:        'ከፍተኛ ዙሮች ተጠናቅቋል',
+    reportEndReason_scenario_complete:'ሁኔታው ተጠናቅቋል',
+
+    // ── Report page — band labels ─────────────────────────────────
+    bandVulnerable: 'ተጋላጭ',
+    bandPartial:    'በከፊል ጠንካራ',
+    bandResilient:  'ጠንካራ',
+    bandStrong:     'እጅግ ጠንካራ',
+
+    // ── Report page — degraded notice ────────────────────────────
+    reportDegradedNotice: 'አንዳንድ ግምገማዎች አልተደረሱም። የሚታየው ውጤት ሙሉ ላይሆን ይችላል።',
+
+    // ── Report page — checkpoints section ────────────────────────
+    reportCheckpoints:       'የፍተሻ ነጥቦች',
+    checkpointPassed:        'አለፈ',
+    checkpointFailed:        'አልፈቀደም',
+    checkpointNa:            'ተፈጻሚ አይደለም',
+    checkpointUnjudged:      'ሊገመገም አልቻለም',
+    checkpointNaNote:        'ተፈጻሚ አይደለም: የሁኔታው ይህ ክፍል አልተደረሰም።',
+    checkpointUnjudgedNote:  'ሊገመገም አልቻለም። ይህ እንደ ውድቀት አይቆጠርም።',
+    checkpointYourMessage:   'የእርስዎ መልዕክት:',
+
+    // ── Report page — timeline section ───────────────────────────
+    reportTimeline:       'የዘዴ ዘመን ቅደም ተከተል',
+    reportOpeningMessage: 'የመጀመሪያ መልዕክት',
+    reportFromTurn:       'ከዙር {n} ጀምሮ',
+
+    // ── Report page — feedback section ───────────────────────────
+    reportFeedback:   'ግብረ መልስ',
+    feedbackDidWell:  'ምን ጥሩ አደረጉ',
+    feedbackImprove:  'ምን ማሻሻል ይኖርብዎታል',
+    feedbackNextTime: 'ቀጣይ ጊዜ ምን ማድረግ ይኖርብዎታል',
+
+    // ── Report page — footer actions ──────────────────────────────
+    reportTryAnother: 'ሌላ ሁኔታ ሞክር',
+    reportMyHistory:  'ታሪኬ',
   },
 }
