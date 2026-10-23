@@ -61,6 +61,7 @@ export function setUnauthorizedHandler(fn) {
 
 // ── Core request ─────────────────────────────────────────────────
 const BASE_URL = import.meta.env.VITE_API_URL ?? ''
+const API_BASE_URL = BASE_URL.endsWith('/') ? BASE_URL.slice(0, -1) : BASE_URL
 
 /**
  * @param {'GET'|'POST'|'PUT'|'PATCH'|'DELETE'} method
@@ -70,13 +71,17 @@ const BASE_URL = import.meta.env.VITE_API_URL ?? ''
  * @throws {ApiError}
  */
 export async function request(method, path, body) {
+  if (import.meta.env.PROD && !API_BASE_URL.trim()) {
+    throw new ApiError(0, 'NETWORK_ERROR', 'API URL is not configured')
+  }
+
   const headers = { 'Content-Type': 'application/json' }
   const token = getToken()
   if (token) headers['Authorization'] = `Bearer ${token}`
 
   let response
   try {
-    response = await fetch(BASE_URL + path, {
+    response = await fetch(API_BASE_URL + path, {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
