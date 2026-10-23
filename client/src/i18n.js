@@ -41,6 +41,21 @@ export const strings = {
     scenarioChannelTelegram: 'Telegram',
     scenarioChannelMessage: 'Message',
 
+    // ── Chat page ────────────────────────────────────────────────
+    chatLoading: 'Loading conversation…',
+    chatSessionNotFound: 'This conversation could not be found.',
+    chatBackToScenarios: 'Back to scenarios',
+    chatTurnCounter: 'Turn {current} of {maximum}',
+    simulationBanner: 'This is a simulation. Never type your real passwords, codes or ID numbers. Use only the fake data on your card.',
+    chatCollapsePersona: 'Hide details',
+    chatExpandPersona: 'Show details',
+    chatFakeDataNote: 'This data is fake. Use only this data in the conversation.',
+    chatTyping: 'The other side is typing…',
+    chatEnded: 'The conversation has ended.',
+    chatMessageLabel: 'Your message',
+    chatMessagePlaceholder: 'Write your message…',
+    chatSend: 'Send',
+
     // ── Auth / status UI ─────────────────────────────────────────
     statusLoading:          'Loading…',
     errorCannotReachServer: 'Cannot reach the server. Please check your connection.',
@@ -160,6 +175,21 @@ export const strings = {
     scenarioChannelCall: 'ስልክ ጥሪ',
     scenarioChannelTelegram: 'ቴሌግራም',
     scenarioChannelMessage: 'መልዕክት',
+
+    // ── Chat page ────────────────────────────────────────────────
+    chatLoading: 'ውይይቱ በመጫን ላይ…',
+    chatSessionNotFound: 'ይህ ውይይት አልተገኘም።',
+    chatBackToScenarios: 'ወደ ሁኔታዎች ተመለስ',
+    chatTurnCounter: 'ተራ {current} ከ {maximum}',
+    simulationBanner: 'ይህ ማስመሰያ ነው። እውነተኛ የይለፍ ቃሎችዎን፣ ኮዶችዎን ወይም የመታወቂያ ቁጥሮችዎን በፍጹም አይተይቡ። በካርድዎ ላይ ያለውን ሐሰተኛ መረጃ ብቻ ይጠቀሙ።',
+    chatCollapsePersona: 'ዝርዝሩን ደብቅ',
+    chatExpandPersona: 'ዝርዝሩን አሳይ',
+    chatFakeDataNote: 'ይህ መረጃ ሐሰተኛ ነው። በውይይቱ ውስጥ ይህንን መረጃ ብቻ ይጠቀሙ።',
+    chatTyping: 'ሌላኛው ወገን እየጻፈ ነው…',
+    chatEnded: 'ውይይቱ ተጠናቋል።',
+    chatMessageLabel: 'የእርስዎ መልዕክት',
+    chatMessagePlaceholder: 'መልዕክትዎን ይጻፉ…',
+    chatSend: 'ላክ',
 
     // ── Auth / status UI ─────────────────────────────────────────
     statusLoading:          'በመጫን ላይ…',
