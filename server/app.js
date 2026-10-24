@@ -10,6 +10,7 @@ import { ZodError } from 'zod'
 import { AppError, notFound, validationError } from './utils/errors.js'
 import { createAuthRouter } from './routes/auth.js'
 import { createRequireAuth } from './middleware/auth.js'
+import { createRateLimiters } from './middleware/rateLimits.js'
 
 /**
  * @param {{ clientOrigins: string[] }} config
@@ -18,7 +19,9 @@ import { createRequireAuth } from './middleware/auth.js'
 export function createApp(config) {
   const app = express()
   const requireAuth = createRequireAuth({ jwtSecret: config.JWT_SECRET })
+  const { globalLimiter, authLimiter, startSessionLimiter, messageLimiter, finishLimiter } = createRateLimiters()
   app.locals.requireAuth = requireAuth
+  app.locals.rateLimits = { startSessionLimiter, messageLimiter, finishLimiter }
 
   // ── Trust proxy (for rate-limit, IP detection behind reverse proxy) ──
   app.set('trust proxy', 1)
@@ -28,6 +31,9 @@ export function createApp(config) {
 
   // ── CORS ──────────────────────────────────────────────────────
   app.use(cors({ origin: config.clientOrigins }))
+
+  // ── Global API rate limit ───────────────────────────────────
+  app.use('/api', globalLimiter)
 
   // ── JSON body parser (10 kb limit) ───────────────────────────
   app.use(express.json({ limit: '10kb' }))
@@ -50,7 +56,7 @@ export function createApp(config) {
     res.json({ ok: true })
   })
 
-  app.use('/api/auth', createAuthRouter(config, requireAuth))
+  app.use('/api/auth', authLimiter, createAuthRouter(config, requireAuth))
 
   // ── 404 handler for unmatched routes ─────────────────────────
   app.use((_req, res, next) => {
