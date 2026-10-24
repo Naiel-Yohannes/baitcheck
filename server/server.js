@@ -7,6 +7,9 @@ import 'dotenv/config'
 import mongoose from 'mongoose'
 import { loadConfig } from './config.js'
 import { createApp } from './app.js'
+import User from './models/User.js'
+import Org from './models/Org.js'
+import Session from './models/Session.js'
 
 // ── Config ────────────────────────────────────────────────────────
 let config
@@ -21,6 +24,7 @@ try {
 try {
   await mongoose.connect(config.MONGO_URI)
   console.log('MongoDB connected')
+  await Promise.all([User.init(), Org.init(), Session.init()])
 } catch {
   // Never print the URI
   console.error('Could not connect to MongoDB')
