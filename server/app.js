@@ -8,6 +8,8 @@ import express from 'express'
 import helmet  from 'helmet'
 import { ZodError } from 'zod'
 import { AppError, notFound, validationError } from './utils/errors.js'
+import { createAuthRouter } from './routes/auth.js'
+import { createRequireAuth } from './middleware/auth.js'
 
 /**
  * @param {{ clientOrigins: string[] }} config
@@ -15,6 +17,8 @@ import { AppError, notFound, validationError } from './utils/errors.js'
  */
 export function createApp(config) {
   const app = express()
+  const requireAuth = createRequireAuth({ jwtSecret: config.JWT_SECRET })
+  app.locals.requireAuth = requireAuth
 
   // ── Trust proxy (for rate-limit, IP detection behind reverse proxy) ──
   app.set('trust proxy', 1)
@@ -45,6 +49,8 @@ export function createApp(config) {
   app.get('/api/health', (_req, res) => {
     res.json({ ok: true })
   })
+
+  app.use('/api/auth', createAuthRouter(config, requireAuth))
 
   // ── 404 handler for unmatched routes ─────────────────────────
   app.use((_req, res, next) => {
