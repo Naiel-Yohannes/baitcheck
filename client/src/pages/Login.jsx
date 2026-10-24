@@ -51,7 +51,7 @@ export default function Login() {
   function validate() {
     const errs = {}
     if (!isValidEmail(email)) errs.email = t('validEmailRequired')
-    if (!password)            errs.password = t('validPasswordRequired')
+    if (!password)            errs.password = t('validPasswordEmpty')
     return errs
   }
 

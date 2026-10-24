@@ -32,6 +32,8 @@ export default function App() {
               <Route path="/admin" element={<Admin />} />
             </Route>
           </Route>
+
+          <Route path="*" element={<Navigate to="/scenarios" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

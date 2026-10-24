@@ -86,23 +86,29 @@ function SuccessPanel({ joinCode, t, onContinue }) {
         </p>
       </div>
 
-      {/* Join code — large, prominent, selectable */}
-      <div className="bg-gray-800 border border-indigo-700 rounded-2xl px-8 py-6">
-        <p
-          className="font-mono text-5xl font-bold tracking-[0.25em] text-indigo-300 select-all"
-          aria-label={`Join code: ${joinCode}`}
-        >
-          {joinCode}
-        </p>
-      </div>
+      {joinCode ? (
+        <>
+          {/* Join code — large, prominent, selectable */}
+          <div className="bg-gray-800 border border-indigo-700 rounded-2xl px-8 py-6">
+            <p
+              className="font-mono text-5xl font-bold tracking-[0.25em] text-indigo-300 select-all"
+              aria-label={`Join code: ${joinCode}`}
+            >
+              {joinCode}
+            </p>
+          </div>
 
-      {/* Copy button */}
-      <button
-        onClick={handleCopy}
-        className="min-h-[44px] px-6 rounded-lg bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium transition-colors"
-      >
-        {copyLabel === 'copied' ? t('registerCopied') : t('registerCopyCode')}
-      </button>
+          {/* Copy button */}
+          <button
+            onClick={handleCopy}
+            className="min-h-[44px] px-6 rounded-lg bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium transition-colors"
+          >
+            {copyLabel === 'copied' ? t('registerCopied') : t('registerCopyCode')}
+          </button>
+        </>
+      ) : (
+        <p className="max-w-sm text-sm leading-relaxed text-amber-200">{t('registerJoinCodeMissing')}</p>
+      )}
 
       {/* Continue */}
       <button
@@ -120,6 +126,7 @@ export default function Register() {
   const { user, register } = useAuth()
   const { t } = useLang()
   const navigate = useNavigate()
+  const creatingOrgRef = useRef(false)
 
   // Account type
   const [accountType, setAccountType] = useState('individual')
@@ -149,7 +156,7 @@ export default function Register() {
   }
 
   // Already-logged-in guard (skip if success panel is showing)
-  if (user && successCode === null) return <Navigate to="/scenarios" replace />
+  if (user && successCode === null && !creatingOrgRef.current) return <Navigate to="/scenarios" replace />
 
   // ── Client-side validation ──────────────────────────────────────
   function validate() {
@@ -196,15 +203,17 @@ export default function Register() {
 
     setPending(true)
     try {
+      creatingOrgRef.current = accountType === 'create'
       const res = await register(body)
 
-      if (accountType === 'create') {
+      if (creatingOrgRef.current) {
         // Show the success panel with the returned join code
-        setSuccessCode(res.joinCode)
+        setSuccessCode(res.joinCode ?? '')
       } else {
         navigate('/scenarios', { replace: true })
       }
     } catch (err) {
+      creatingOrgRef.current = false
       // Per-field server errors
       if (err.code === 'INVALID_JOIN_CODE') {
         setErrors({ joinCode: t('error_INVALID_JOIN_CODE') })

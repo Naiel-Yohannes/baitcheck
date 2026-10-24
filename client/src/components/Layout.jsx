@@ -142,9 +142,9 @@ export default function Layout() {
       </nav>
 
       {/* ── Page content ─────────────────────────────────────────── */}
-      <main className="p-6">
+      <div className="p-6">
         <Outlet />
-      </main>
+      </div>
     </div>
   )
 }

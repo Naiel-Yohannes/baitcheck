@@ -68,6 +68,7 @@ export const strings = {
     errorCannotReachServer: 'Cannot reach the server. Please check your connection.',
     actionRetry:            'Retry',
     errorNoPermission:      'You do not have permission to view this page.',
+    adminNoPermission:      'You do not have permission to view the organization summary.',
     navUserLabel:           'Logged in as',
     actionLogout:           'Logout',
 
@@ -108,6 +109,7 @@ export const strings = {
     // ── Validation messages ───────────────────────────────────────
     validEmailRequired:     'Please enter a valid email address.',
     validPasswordRequired:  'Password must be at least 8 characters.',
+    validPasswordEmpty:     'Please enter your password.',
     validPasswordTooLong:   'Password must be 72 characters or fewer.',
     validNameRequired:      'Name must be at least 2 characters.',
     validNameTooLong:       'Name must be 60 characters or fewer.',
@@ -140,6 +142,7 @@ export const strings = {
     // ── Register success panel (orgAdmin) ─────────────────────────
     registerSuccessHeading: 'Organization created!',
     registerSuccessBody:    'Share this code with your employees so they can join your organization:',
+    registerJoinCodeMissing:'Your organization was created, but the join code is unavailable. You can find it on the Admin page.',
     registerCopyCode:       'Copy code',
     registerCopied:         'Copied!',
     registerContinue:       'Continue to Scenarios',
@@ -290,6 +293,7 @@ export const strings = {
     errorCannotReachServer: 'አገልጋዩን ማግኘት አልተቻለም። ግንኙነትዎን ያረጋግጡ።',
     actionRetry:            'እንደገና ሞክር',
     errorNoPermission:      'ይህን ገጽ የማየት ፈቃድ የለዎትም።',
+    adminNoPermission:      'የድርጅቱን ማጠቃለያ ለማየት ፈቃድ የለዎትም።',
     navUserLabel:           'የገቡት',
     actionLogout:           'ውጣ',
 
@@ -319,6 +323,7 @@ export const strings = {
     // ── Validation messages ───────────────────────────────────────
     validEmailRequired:     'እባክዎ ትክክለኛ ኢሜይል አድራሻ ያስገቡ።',
     validPasswordRequired:  'የይለፍ ቃሉ ቢያንስ 8 ቁምፊዎች መሆን አለበት።',
+    validPasswordEmpty:     'እባክዎ የይለፍ ቃልዎን ያስገቡ።',
     validPasswordTooLong:   'የይለፍ ቃሉ ከ72 ቁምፊዎች ማለፍ የለበትም።',
     validNameRequired:      'ስሙ ቢያንስ 2 ቁምፊዎች መሆን አለበት።',
     validNameTooLong:       'ስሙ ከ60 ቁምፊዎች ማለፍ የለበትም።',
@@ -351,6 +356,7 @@ export const strings = {
     // ── Register success panel (orgAdmin) ─────────────────────────
     registerSuccessHeading: 'ድርጅቱ ተፈጥሯል!',
     registerSuccessBody:    'ሠራተኞችዎ ድርጅቱን እንዲቀላቀሉ ይህን ኮድ ያጋሩ:',
+    registerJoinCodeMissing:'ድርጅትዎ ተፈጥሯል፣ ግን የመቀላቀያ ኮዱ አልተገኘም። በአስተዳዳሪ ገጹ ላይ ማግኘት ይችላሉ።',
     registerCopyCode:       'ኮድ ቅዳ',
     registerCopied:         'ተቀድቷል!',
     registerContinue:       'ወደ ሁኔታዎች ቀጥል',
