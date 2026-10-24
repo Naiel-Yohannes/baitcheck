@@ -12,6 +12,7 @@ import User from './models/User.js'
 import Org from './models/Org.js'
 import Session from './models/Session.js'
 import { loadScenarios } from './scenarios/loadScenarios.js'
+import { createFakeAi } from './engine/fakeAi.js'
 
 // ── Config ────────────────────────────────────────────────────────
 let config
@@ -23,14 +24,14 @@ try {
 }
 
 // ── Scenario data ────────────────────────────────────────────────
-let scenarios
+let store
 try {
   const scenariosDir = fileURLToPath(new URL('./scenarios/', import.meta.url))
-  scenarios = await loadScenarios(scenariosDir, {
+  store = await loadScenarios(scenariosDir, {
     expectedCount: config.NODE_ENV === 'production' ? 3 : null,
   })
-  if (config.NODE_ENV !== 'production' && scenarios.getAll().length < 3) {
-    console.warn(`Only ${scenarios.getAll().length} of 3 scenarios found (allowed outside production)`)
+  if (config.NODE_ENV !== 'production' && store.getAll().length < 3) {
+    console.warn(`Only ${store.getAll().length} of 3 scenarios found (allowed outside production)`)
   }
 } catch (err) {
   console.error(err.message)
@@ -49,7 +50,9 @@ try {
 }
 
 // ── HTTP server ───────────────────────────────────────────────────
-const app = createApp(config, { scenarios })
+const ai = createFakeAi()
+console.log('WARNING: using the FAKE attacker (no real AI connected)')
+const app = createApp(config, { scenarios: store, ai })
 app.listen(config.PORT, () => {
   console.log(`Server listening on port ${config.PORT}`)
 })

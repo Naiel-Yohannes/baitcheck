@@ -13,6 +13,8 @@ import { createOrgRouter } from './routes/org.js'
 import { createRequireAuth } from './middleware/auth.js'
 import { createRateLimiters } from './middleware/rateLimits.js'
 import { createScenariosRouter } from './routes/scenarios.js'
+import { createSessionsRouter } from './routes/sessions.js'
+import { createSessionRepo } from './repos/sessionRepo.js'
 
 /**
  * @param {{ clientOrigins: string[] }} config
@@ -72,6 +74,16 @@ export function createApp(config, deps = {}) {
     app.use('/api/scenarios', createScenariosRouter({
       requireAuth: app.locals.requireAuth,
       store: deps.scenarios,
+    }))
+  }
+
+  if (deps.ai && deps.scenarios) {
+    app.use('/api/sessions', createSessionsRouter({
+      requireAuth: app.locals.requireAuth,
+      rateLimits: app.locals.rateLimits,
+      store: deps.scenarios,
+      ai: deps.ai,
+      repo: deps.sessionRepo ?? createSessionRepo(),
     }))
   }
 
