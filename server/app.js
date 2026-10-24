@@ -9,14 +9,16 @@ import helmet  from 'helmet'
 import { ZodError } from 'zod'
 import { AppError, notFound, validationError } from './utils/errors.js'
 import { createAuthRouter } from './routes/auth.js'
+import { createOrgRouter } from './routes/org.js'
 import { createRequireAuth } from './middleware/auth.js'
 import { createRateLimiters } from './middleware/rateLimits.js'
 
 /**
  * @param {{ clientOrigins: string[] }} config
+ * @param {{ getScenarioTitle?: (scenarioId: string, language?: string) => string }} [deps]
  * @returns {import('express').Express}
  */
-export function createApp(config) {
+export function createApp(config, deps = {}) {
   const app = express()
   const requireAuth = createRequireAuth({ jwtSecret: config.JWT_SECRET })
   const { globalLimiter, authLimiter, startSessionLimiter, messageLimiter, finishLimiter } = createRateLimiters()
@@ -57,6 +59,11 @@ export function createApp(config) {
   })
 
   app.use('/api/auth', authLimiter, createAuthRouter(config, requireAuth))
+
+  app.use('/api/org', createOrgRouter({
+    requireAuth: app.locals.requireAuth,
+    getScenarioTitle: deps.getScenarioTitle,
+  }))
 
   // ── 404 handler for unmatched routes ─────────────────────────
   app.use((_req, res, next) => {
