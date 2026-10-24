@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* ── Font stacks ──────────────────────────────────────────────── */
+:root {
+  --font-ui: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+    Roboto, Helvetica, Arial, sans-serif;
+  --font-ethiopic: 'Noto Sans Ethiopic', 'Ebrima', 'Nyala',
+    system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-ui);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Amharic / Ethiopic text ──────────────────────────────────── */
+/*
+  Applied via the .lang-am class on text nodes rendered in Amharic,
+  AND globally when <html lang="am"> is set by LanguageContext.
+*/
+:lang(am),
+.lang-am {
+  font-family: var(--font-ethiopic);
+  /*
+    Ethiopic script has taller ascenders; bump line-height
+    slightly above the default 1.5 used for Latin.
+  */
+  line-height: 1.75;
+}
