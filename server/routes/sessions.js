@@ -11,6 +11,7 @@ import {
 } from '../utils/errors.js'
 import { getEndReason, getStageIndex } from '../engine/stages.js'
 import { checkUserInput, sanitizeOutput } from '../engine/safety.js'
+import { buildSessionReport } from '../engine/finish.js'
 
 const startSchema = z.object({
   scenarioId: z.string(),
@@ -207,6 +208,42 @@ export function createSessionsRouter({ requireAuth, rateLimits, store, ai, repo 
       ended: isFinal,
       warning: null,
     })
+  }))
+
+  router.post('/:id/finish', requireAuth, rateLimits.finishLimiter, asyncHandler(async (req, res) => {
+    const userId = req.user._id
+    const session = await repo.findOwned(req.params.id, userId)
+    if (!session) throw notFound()
+    if (session.status === 'finished') {
+      return res.status(200).json({ report: session.report })
+    }
+    if (session.turnCount === 0) {
+      throw validationError('Nothing to evaluate yet', [{ field: 'turnCount', issue: 'no messages were sent' }])
+    }
+
+    const scenario = store.getById(session.scenarioId)
+    if (!scenario) throw notFound()
+
+    const { report, endReason } = await buildSessionReport({ session, scenario, ai })
+    const updated = await repo.finalize({
+      id: req.params.id,
+      userId,
+      set: {
+        finishedAt: new Date(),
+        endReason,
+        score: report.score,
+        band: report.band,
+        report,
+      },
+    })
+    if (!updated) {
+      const reloaded = await repo.findOwned(req.params.id, userId)
+      if (reloaded?.status === 'finished') {
+        return res.status(200).json({ report: reloaded.report })
+      }
+      throw notFound()
+    }
+    return res.status(200).json({ report })
   }))
 
   return router

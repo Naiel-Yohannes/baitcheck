@@ -53,5 +53,41 @@ export function createSessionRepo(SessionModel = Session) {
       ).lean()
       return toPlain(doc)
     },
+
+    async finalize({ id, userId, set }) {
+      const doc = await SessionModel.findOneAndUpdate(
+        { _id: id, userId, status: 'active' },
+        {
+          $set: {
+            status: 'finished',
+            finishedAt: set.finishedAt,
+            endReason: set.endReason,
+            score: set.score,
+            band: set.band,
+            report: set.report,
+          },
+        },
+        { new: true },
+      ).lean()
+      return toPlain(doc)
+    },
+
+    async finalize({ id, userId, set }) {
+      const doc = await SessionModel.findOneAndUpdate(
+        { _id: id, userId, status: 'active' },
+        {
+          $set: {
+            status: 'finished',
+            finishedAt: set.finishedAt,
+            endReason: set.endReason,
+            score: set.score,
+            band: set.band,
+            report: set.report,
+          },
+        },
+        { new: true },
+      ).lean()
+      return toPlain(doc)
+    },
   }
 }

@@ -13,6 +13,7 @@
  * Amharic lines are a temporary draft and need review by a native speaker.
  */
 import { llmBusy, llmFailed } from '../utils/errors.js'
+import { buildFallbackFeedback } from './feedback.js'
 
 const CLOSING = {
   en: 'Alright, I will end the call here. Take care.',
@@ -82,6 +83,49 @@ export function createFakeAi() {
       const pack = LINES[lang][stageIndex] ?? LINES[lang][0]
       const userCount = (Array.isArray(history) ? history : []).filter(message => message?.role === 'user').length
       return pack[userCount % pack.length]
+    },
+
+    async judgeCheckpoints({ scenario, language, checkpoints, userMessages }) {
+      // This is a stand-in for the real Gemini judge.
+      const messages = Array.isArray(userMessages) ? userMessages : []
+      if (messages.some(message => (typeof message === 'string' ? message : message?.text) === '/unjudged')) {
+        throw llmFailed()
+      }
+      const lang = language === 'am' ? 'am' : 'en'
+      // Amharic examples below are temporary drafts that need native review.
+      const complianceWords = lang === 'am'
+        ? ['እሺ', 'አዎ', 'አሁን']
+        : ['ok', 'okay', 'fine', 'sure', 'alright', 'hurry']
+      const suspicionMarkers = lang === 'am'
+        ? ['ማን', 'አረጋግጥ', 'ይፋዊ', 'ማስረጃ', 'አጠራጣሪ', 'ለምን', 'ሪፖርት']
+        : ['who', 'verify', 'official', 'prove', 'proof', 'confirm', 'scam', 'suspicious', 'why', 'call back', '?']
+      const textOf = message => typeof message === 'string' ? message : (typeof message?.text === 'string' ? message.text : '')
+      return (Array.isArray(checkpoints) ? checkpoints : []).map(checkpoint => {
+        const texts = messages.map(textOf)
+        if (/urgen|rush|pressure|deadline/i.test(checkpoint.id)) {
+          const compliant = lang === 'am'
+            ? texts.some(text => complianceWords.some(word => text.includes(word)))
+            : texts.some(text => complianceWords.some(word => new RegExp(`\\b${word}\\b`, 'i').test(text)))
+          return { id: checkpoint.id, passed: !compliant, evidence: null }
+        }
+        const evidence = messages.find(message => {
+          const text = textOf(message)
+          return lang === 'am'
+            ? suspicionMarkers.some(marker => text.includes(marker))
+            : suspicionMarkers.some(marker => marker === '?'
+              ? text.includes(marker)
+              : new RegExp(`\\b${marker.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(text))
+        })
+        return { id: checkpoint.id, passed: evidence !== undefined, evidence: evidence === undefined ? null : textOf(evidence) }
+      })
+    },
+
+    async generateFeedback({ scenario, language, results, band, userMessages }) {
+      const messages = Array.isArray(userMessages) ? userMessages : []
+      if (messages.some(message => (typeof message === 'string' ? message : message?.text) === '/nofeedback')) {
+        throw llmFailed()
+      }
+      return buildFallbackFeedback({ scenario, language, results, band })
     },
   }
 }

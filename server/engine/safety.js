@@ -84,17 +84,9 @@ function truncateAtSentence(text, max) {
   return (lastEnd > 0 ? shortened.slice(0, lastEnd + 1) : shortened).trim()
 }
 
-export function sanitizeOutput(text, scenario, language) {
-  const original = typeof text === 'string' ? text : ''
-  const fallback = fallbackFor(scenario, language)
-  const goal = scenario?.attacker?.goal
-  if (
-    original.includes('###') ||
-    /\b(?:RULES|SYSTEM)\b/.test(original) ||
-    (typeof goal === 'string' && goal.length > 0 && original.toLowerCase().includes(goal.toLowerCase()))
-  ) return fallback
-
-  let safe = original.replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[email removed]')
+export function redactUnsafeText(text, scenario) {
+  let safe = typeof text === 'string' ? text : ''
+  safe = safe.replace(/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/gi, '[email removed]')
   safe = safe.replace(/(?<!\w)@[A-Za-z0-9_]{4,}/g, '[username removed]')
   safe = safe.replace(/\b(?:https?:\/\/|www\.)\S+/gi, replaceUrlWithMarker)
   safe = safe.replace(/\b(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+(?:com|net|org|et|io|me|co)(?:\/[^\s]*)?/gi, replaceUrlWithMarker)
@@ -107,6 +99,21 @@ export function sanitizeOutput(text, scenario, language) {
     const digits = match.replace(/[\s.\-]/g, '')
     return fakeDigits.has(digits) ? match : '[number removed]'
   })
+
+  return safe
+}
+
+export function sanitizeOutput(text, scenario, language) {
+  const original = typeof text === 'string' ? text : ''
+  const fallback = fallbackFor(scenario, language)
+  const goal = scenario?.attacker?.goal
+  if (
+    original.includes('###') ||
+    /\b(?:RULES|SYSTEM)\b/.test(original) ||
+    (typeof goal === 'string' && goal.length > 0 && original.toLowerCase().includes(goal.toLowerCase()))
+  ) return fallback
+
+  let safe = redactUnsafeText(original, scenario)
 
   safe = safe.trim()
   if (!safe) return fallback
