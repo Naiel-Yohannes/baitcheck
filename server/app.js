@@ -12,6 +12,7 @@ import { createAuthRouter } from './routes/auth.js'
 import { createOrgRouter } from './routes/org.js'
 import { createRequireAuth } from './middleware/auth.js'
 import { createRateLimiters } from './middleware/rateLimits.js'
+import { createScenariosRouter } from './routes/scenarios.js'
 
 /**
  * @param {{ clientOrigins: string[] }} config
@@ -62,8 +63,17 @@ export function createApp(config, deps = {}) {
 
   app.use('/api/org', createOrgRouter({
     requireAuth: app.locals.requireAuth,
-    getScenarioTitle: deps.getScenarioTitle,
+    getScenarioTitle: deps.getScenarioTitle ?? (deps.scenarios
+      ? (id, language) => deps.scenarios.getTitle(id, language)
+      : undefined),
   }))
+
+  if (deps.scenarios) {
+    app.use('/api/scenarios', createScenariosRouter({
+      requireAuth: app.locals.requireAuth,
+      store: deps.scenarios,
+    }))
+  }
 
   // ── 404 handler for unmatched routes ─────────────────────────
   app.use((_req, res, next) => {

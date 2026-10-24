@@ -1,0 +1,128 @@
+{
+  "id": "mobile-money-call",
+  "title": {
+    "en": "The Urgent Bank Call",
+    "am": "አስቸኳይ የባንክ ጥሪ"
+  },
+  "description": {
+    "en": "A caller claiming to be a security officer asks you to protect your mobile money wallet.",
+    "am": "የደህንነት ሰራተኛ ነኝ የሚል ደዋይ የሞባይል ገንዘብ ቦርሳዎን እንዲጠብቁ ይጠይቃል።"
+  },
+  "languages": ["en", "am"],
+  "channel": "call",
+  "estimatedMinutes": 3,
+  "maxTurns": 10,
+  "turnsPerStage": 2,
+  "persona": {
+    "userRole": {
+      "en": "You are Abebe, a regular customer of a mobile money wallet, and your phone rings.",
+      "am": "አንተ የሞባይል ገንዘብ ቦርሳ መደበኛ ደንበኛ የሆንክ አበበ ነህ፤ ስልክህ ይጠራል።"
+    },
+    "fakeData": [
+      {
+        "key": "fake_pin",
+        "label": {
+          "en": "Fake PIN",
+          "am": "የሐሰት ፒን"
+        },
+        "value": "4821"
+      },
+      {
+        "key": "fake_otp",
+        "label": {
+          "en": "Fake OTP",
+          "am": "የሐሰት አንድ ጊዜ ኮድ"
+        },
+        "value": "739204"
+      }
+    ]
+  },
+  "attacker": {
+    "identity": {
+      "en": "A fake security officer from the fictional mobile money company BirrPay.",
+      "am": "ከቢርፔይ የተባለው ምናባዊ የሞባይል ገንዘብ ኩባንያ የመጣ የሐሰት የደህንነት ሰራተኛ።"
+    },
+    "goal": "Get the user to read out the fake OTP",
+    "style": "Calm, official, increasingly pushy. Short messages."
+  },
+  "openingLine": {
+    "en": "Hello, this is Daniel from BirrPay Security. We noticed suspicious activity on your wallet.",
+    "am": "ሰላም፣ ከቢርፔይ ደህንነት ክፍል ዳንኤል ነኝ። በቦርሳዎ ላይ አጠራጣሪ እንቅስቃሴ አይተናል።"
+  },
+  "fallbackLine": {
+    "en": "Sorry, the line is breaking up. Can you repeat that?",
+    "am": "ይቅርታ፣ ድምፁ እየተቋረጠ ነው። እንደገና መድገም ይችላሉ?"
+  },
+  "endSignals": {
+    "en": ["hang up", "stop the conversation", "i will report", "i am calling the official number"],
+    "am": ["ስልኩን እዘጋለሁ", "ውይይቱን አቁም", "ሪፖርት አደርጋለሁ", "ይፋዊውን ቁጥር እደውላለሁ"]
+  },
+  "stages": [
+    {
+      "id": "stage_1",
+      "technique": { "en": "Authority", "am": "ሥልጣን" },
+      "instruction": { "en": "Speak as an official security worker and establish confidence.", "am": "እንደ ይፋዊ የደህንነት ሰራተኛ ተናገርና እምነት ለመፍጠር ሞክር።" },
+      "explanation": { "en": "Authority makes a request seem trustworthy because it appears to come from an official.", "am": "የሥልጣን ማስመሰል ጥያቄው ከይፋዊ ሰው የመጣ እንዲመስል ያደርጋል።" }
+    },
+    {
+      "id": "stage_2",
+      "technique": { "en": "Urgency", "am": "አስቸኳይነት" },
+      "instruction": { "en": "Say the wallet may be blocked unless the user acts quickly.", "am": "ተጠቃሚው በፍጥነት ካልተንቀሳቀሰ ቦርሳው ሊታገድ እንደሚችል ተናገር።" },
+      "explanation": { "en": "Urgency pressures someone to act before they can check whether a claim is true.", "am": "አስቸኳይነት ጥያቄው እውነት መሆኑን ከመመርመር በፊት እንዲንቀሳቀሱ ጫና ያደርጋል።" }
+    },
+    {
+      "id": "stage_3",
+      "technique": { "en": "Pretexting", "am": "ምክንያት መፍጠር" },
+      "instruction": { "en": "Invent a security check and ask the user to read out the code just sent to their phone.", "am": "የደህንነት ማረጋገጫ ምክንያት ፍጠርና ወደ ስልካቸው የተላከውን ኮድ እንዲያነቡ ጠይቅ።" },
+      "explanation": { "en": "Pretexting uses an invented story to make a sensitive request seem necessary.", "am": "ምክንያት መፍጠር ሚስጥራዊ መረጃ መጠየቅን አስፈላጊ እንዲመስል የተፈጠረ ታሪክ ይጠቀማል።" }
+    },
+    {
+      "id": "stage_4",
+      "technique": { "en": "Pressure and fear", "am": "ጫና እና ፍርሃት" },
+      "instruction": { "en": "Warn that refusing may cause a loss and press for an immediate answer.", "am": "እምቢ ማለት ኪሳራ ሊያመጣ እንደሚችል አስጠንቅቅና ወዲያውኑ መልስ እንዲሰጡ ጫና አድርግ።" },
+      "explanation": { "en": "Fear and pressure can make someone share information to avoid an imagined loss.", "am": "ፍርሃትና ጫና ሰው የሚገመተውን ኪሳራ ለመከላከል መረጃ እንዲያጋራ ሊያደርጉት ይችላሉ።" }
+    }
+  ],
+  "checkpoints": [
+    {
+      "id": "verify_caller",
+      "weight": 2,
+      "detection": "ai",
+      "description": {
+        "en": "The user questions the caller or says they will verify through the official app or number.",
+        "am": "ተጠቃሚው ደዋዩን ይጠይቃል ወይም በይፋዊው መተግበሪያ ወይም ቁጥር እንደሚያረጋግጥ ይናገራል።"
+      }
+    },
+    {
+      "id": "refuse_code",
+      "weight": 4,
+      "detection": "code",
+      "rule": "leak",
+      "keys": ["fake_pin", "fake_otp"],
+      "description": {
+        "en": "The user does not give the PIN or OTP.",
+        "am": "ተጠቃሚው ፒኑን ወይም አንድ ጊዜ ኮዱን አይሰጥም።"
+      }
+    },
+    {
+      "id": "resist_urgency",
+      "weight": 2,
+      "detection": "ai",
+      "description": {
+        "en": "The user does not rush because of the deadline.",
+        "am": "ተጠቃሚው በጊዜ ገደቡ ምክንያት አይቸኩልም።"
+      }
+    },
+    {
+      "id": "end_conversation",
+      "weight": 2,
+      "detection": "code",
+      "rule": "endedBy",
+      "description": {
+        "en": "The user ends the conversation or reports it.",
+        "am": "ተጠቃሚው ውይይቱን ያቋርጣል ወይም ሪፖርት ያደርገዋል።"
+      }
+    }
+  ],
+  "_reviewNote": "Amharic text drafted by AI; needs native review before the demo."
+}
