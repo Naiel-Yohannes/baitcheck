@@ -13,8 +13,15 @@ import Org from './models/Org.js'
 import Session from './models/Session.js'
 import { loadScenarios } from './scenarios/loadScenarios.js'
 import { createFakeAi } from './engine/fakeAi.js'
+import { createLlm } from './ai/llm.js'
+import { createGeminiAi } from './ai/geminiAi.js'
 
 // ── Config ────────────────────────────────────────────────────────
+if (String(process.env.AI_PROVIDER ?? '').trim() === 'gemini'
+  && (!String(process.env.GEMINI_API_KEY ?? '').trim() || String(process.env.GEMINI_API_KEY).trim().toLowerCase() === 'placeholder')) {
+  console.error('AI_PROVIDER=gemini requires a non-empty GEMINI_API_KEY that is not "placeholder"')
+  process.exit(1)
+}
 let config
 try {
   config = loadConfig()
@@ -50,8 +57,16 @@ try {
 }
 
 // ── HTTP server ───────────────────────────────────────────────────
-const ai = createFakeAi()
-console.log('WARNING: using the FAKE attacker (no real AI connected)')
+let ai
+if (config.AI_PROVIDER === 'gemini') {
+  const fallbackAi = createFakeAi()
+  ai = createGeminiAi({ config, llm: createLlm({ config }), fallbackAi })
+  console.log(`AI provider: gemini (model ${config.LLM_MODEL}) - attacker only, judge and feedback are still fake`)
+} else {
+  ai = createFakeAi()
+  console.log('WARNING: using the FAKE attacker (no real AI connected)')
+  console.log('AI provider: fake')
+}
 const app = createApp(config, { scenarios: store, ai })
 app.listen(config.PORT, () => {
   console.log(`Server listening on port ${config.PORT}`)

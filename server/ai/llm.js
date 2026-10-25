@@ -32,6 +32,11 @@ function parseJsonText(value) {
   return JSON.parse(unfenced)
 }
 
+function withCause(mappedError, cause) {
+  mappedError.cause = cause
+  return mappedError
+}
+
 export function createLlm({ config, client, now = Date.now, sleep = sleepDefault }) {
   let sdkClient = client
   const callTimestamps = []
@@ -58,7 +63,12 @@ export function createLlm({ config, client, now = Date.now, sleep = sleepDefault
 
     const requestConfig = { systemInstruction: system, temperature, maxOutputTokens }
     if (json) requestConfig.responseMimeType = 'application/json'
-    // This installed SDK exposes only thinkingConfig.includeThoughts. It has no thinking-level or thinking-budget setting, so LLM_THINKING_LEVEL is intentionally ignored.
+    const thinkingLevels = { minimal: 'minimal', low: 'low', medium: 'medium', high: 'high' }
+    // A legacy injected test client may not implement the SDK v2 models surface.
+    const supportsSdkV2 = !client || typeof getClient().models?.list === 'function'
+    if (supportsSdkV2 && thinkingLevels[config.LLM_THINKING_LEVEL]) {
+      requestConfig.thinkingConfig = { thinkingLevel: thinkingLevels[config.LLM_THINKING_LEVEL] }
+    }
     const params = { model, contents: prompt, config: requestConfig }
 
     let timer
@@ -92,11 +102,11 @@ export function createLlm({ config, client, now = Date.now, sleep = sleepDefault
       } catch (error) {
         if (error?.code === 'LLM_BUSY' || error?.code === 'LLM_FAILED') throw error
         const status = statusOf(error)
-        if (isQuotaError(error, status)) throw llmBusy()
+        if (isQuotaError(error, status)) throw withCause(llmBusy(), error)
         reportConfigurationProblem(error)
         if (!isTransient(error, status) || retryState.remaining <= 0) {
-          if (status === 503 || retryUsedForQuota) throw llmBusy()
-          throw llmFailed()
+          if (status === 503 || retryUsedForQuota) throw withCause(llmBusy(), error)
+          throw withCause(llmFailed(), error)
         }
         retryState.remaining -= 1
         retryUsedForQuota = status === 503
@@ -173,9 +183,14 @@ export function createLlm({ config, client, now = Date.now, sleep = sleepDefault
       error.code = 'MODEL_LIST_UNSUPPORTED'
       throw error
     }
-    const error = new Error('Model listing is not typed by the installed SDK; no supported model capability field is available.')
-    error.code = 'MODEL_LIST_UNSUPPORTED'
-    throw error
+    const pager = await models.list()
+    const ids = []
+    for await (const model of pager) {
+      if (!Array.isArray(model?.supportedActions) || !model.supportedActions.includes('generateContent')) continue
+      if (typeof model.name !== 'string' || !model.name) continue
+      ids.push(model.name.replace(/^models\//, ''))
+    }
+    return [...new Set(ids)].sort()
   }
 
   return { generateText, generateJSON, listModelIds, getCallCountLastMinute }

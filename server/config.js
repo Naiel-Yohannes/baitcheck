@@ -18,12 +18,19 @@
  *   LLM_TIMEOUT_MS: number,
  *   LLM_THINKING_LEVEL: string|null,
  *   LLM_MODEL_JUDGE: string|null,
+ *   AI_PROVIDER: string,
  *   clientOrigins: string[],
  * }>}
  */
 export function loadConfig(env = process.env) {
   const missing = []
   const invalid = []
+  const AI_PROVIDER = env.AI_PROVIDER === undefined || String(env.AI_PROVIDER).trim() === ''
+    ? 'fake'
+    : String(env.AI_PROVIDER).trim()
+  if (!['fake', 'gemini'].includes(AI_PROVIDER)) {
+    throw new Error('Invalid environment variable(s): AI_PROVIDER (must be fake or gemini)')
+  }
 
   // ── Required string fields ─────────────────────────────────────
   const required = [
@@ -121,6 +128,7 @@ export function loadConfig(env = process.env) {
     LLM_TIMEOUT_MS,
     LLM_THINKING_LEVEL,
     LLM_MODEL_JUDGE,
+    AI_PROVIDER,
     clientOrigins,
   })
 }
