@@ -15,6 +15,9 @@
  *   CLIENT_URL: string,
  *   NODE_ENV: string,
  *   LLM_MAX_RPM: number,
+ *   LLM_TIMEOUT_MS: number,
+ *   LLM_THINKING_LEVEL: string|null,
+ *   LLM_MODEL_JUDGE: string|null,
  *   clientOrigins: string[],
  * }>}
  */
@@ -71,6 +74,33 @@ export function loadConfig(env = process.env) {
     }
   }
 
+  let LLM_TIMEOUT_MS = 20000
+  if (env.LLM_TIMEOUT_MS !== undefined && env.LLM_TIMEOUT_MS !== '') {
+    const raw = String(env.LLM_TIMEOUT_MS).trim()
+    const parsed = /^\d+$/.test(raw) ? Number(raw) : NaN
+    if (!Number.isSafeInteger(parsed) || parsed <= 0) {
+      invalid.push('LLM_TIMEOUT_MS (must be a positive integer)')
+    } else {
+      LLM_TIMEOUT_MS = parsed
+    }
+  }
+
+  const allowedThinkingLevels = ['minimal', 'low', 'medium', 'high']
+  let LLM_THINKING_LEVEL = null
+  if (env.LLM_THINKING_LEVEL !== undefined && String(env.LLM_THINKING_LEVEL).trim() !== '') {
+    const level = String(env.LLM_THINKING_LEVEL).trim()
+    if (!allowedThinkingLevels.includes(level)) {
+      invalid.push('LLM_THINKING_LEVEL (must be minimal, low, medium, or high)')
+    } else {
+      LLM_THINKING_LEVEL = level
+    }
+  }
+
+  let LLM_MODEL_JUDGE = null
+  if (env.LLM_MODEL_JUDGE !== undefined && String(env.LLM_MODEL_JUDGE).trim() !== '') {
+    LLM_MODEL_JUDGE = String(env.LLM_MODEL_JUDGE).trim()
+  }
+
   if (invalid.length > 0) {
     throw new Error(
       `Invalid environment variable(s): ${invalid.join('; ')}`
@@ -88,6 +118,9 @@ export function loadConfig(env = process.env) {
     CLIENT_URL:      values.CLIENT_URL,
     NODE_ENV:        values.NODE_ENV,
     LLM_MAX_RPM,
+    LLM_TIMEOUT_MS,
+    LLM_THINKING_LEVEL,
+    LLM_MODEL_JUDGE,
     clientOrigins,
   })
 }

@@ -31,3 +31,8 @@ The server currently uses a FAKE attacker. A real attacker integration must prov
 - `generateFeedback({ scenario, language, results, score, band, userMessages })` returns `{ summary, didWell, improve, nextTime }`.
 
 Each function should throw `llmBusy()` or `llmFailed()` from `utils/errors.js` when it cannot complete.
+
+
+## AI configuration
+
+Set `GEMINI_API_KEY` and `LLM_MODEL` in `.env`. Copy the exact model ID from `npm run ai:models`; optional settings are `LLM_MODEL_JUDGE`, `LLM_MAX_RPM`, `LLM_TIMEOUT_MS`, and `LLM_THINKING_LEVEL`. Run `npm run ai:models` to list available models and `npm run ai:ping` to make a small connectivity check. AI quota is counted per Google Cloud project, so other apps using the same project share that quota. The installed GenAI SDK version does not expose model listing, so `npm run ai:models` reports that capability as unavailable until the SDK adds it.
