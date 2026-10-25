@@ -1,0 +1,40 @@
+{
+  "id": "boss-favor",
+  "title": { "en": "The Boss Who Needs a Favor", "am": "እርዳታ የሚፈልጉት አለቃ" },
+  "description": { "en": "Someone claiming to be Selam's manager sends an urgent request from a new number.", "am": "ኪዲስት ነኝ የሚል ሰው ከአዲስ ስልክ ቁጥር አስቸኳይ ጥያቄ ለሰላም ይልካል።" },
+  "languages": ["en", "am"],
+  "channel": "message",
+  "estimatedMinutes": 3,
+  "maxTurns": 10,
+  "turnsPerStage": 2,
+  "persona": {
+    "userRole": { "en": "You are Selam, an accountant at the fictional small company Zemen Trading. You get a message from someone claiming to be your manager Kidist, writing from a new number.", "am": "አንቺ በዘመን ትሬዲንግ በተባለ ምናባዊ ትንሽ ኩባንያ የሂሳብ ሹም ሰላም ነሽ። ኪዲስት ነኝ የሚል ሰው ከአዲስ ቁጥር መልእክት ይልክልሻል።" },
+    "fakeData": [{ "key": "fake_voucher_code", "label": { "en": "Fake voucher code", "am": "የሐሰት ቫውቸር ኮድ" }, "value": "VCH-1234" }]
+  },
+  "attacker": {
+    "identity": { "en": "A fraudster pretending to be the user's manager Kidist, writing from a new number.", "am": "ከአዲስ ቁጥር እየጻፈች የተጠቃሚዋ አለቃ ኪዲስት መስላ የምትቀርብ አጭበርባሪ።" },
+    "goal": "Get the user to buy gift vouchers and send the fake voucher code in secret",
+    "style": "Brisk, authoritative, always busy, avoids phone calls. Short messages."
+  },
+  "openingLine": { "en": "Hi Selam, it's Kidist. This is my new number, my phone broke. Are you at your desk? I need a quick favour.", "am": "ሰላም ሰላም፣ ኪዲስት ነኝ። ስልኬ ተበላሽቶ ይህ አዲሱ ቁጥሬ ነው። ጠረጴዛሽ ላይ ነሽ? ፈጣን እርዳታ እፈልጋለሁ።" },
+  "fallbackLine": { "en": "Sorry, the signal is bad. Did you get my message?", "am": "ይቅርታ፣ ሲግናሉ ደካማ ነው። መልእክቴ ደረሰሽ?" },
+  "endSignals": { "en": ["i will report this", "i am reporting this", "stop messaging me", "i am blocking this number"], "am": ["ይህን ሪፖርት አደርጋለሁ", "እየሪፖርትኩ ነው", "መልእክት መላክ አቁሚ", "ይህን ቁጥር እከለክላለሁ"] },
+  "stages": [
+    { "id": "stage_1", "technique": { "en": "Impersonation", "am": "ሌላ ሰው መምሰል" }, "instruction": { "en": "Claim to be the user's manager writing from a new number.", "am": "ከአዲስ ቁጥር የምትጽፍ የተጠቃሚዋ አለቃ እንደሆንሽ ተናገሪ።" }, "explanation": { "en": "Impersonation uses a trusted person's identity to gain cooperation.", "am": "ሌላ ሰው መምሰል ታማኝ ሰውን በመወከል ትብብር ለማግኘት ይሞክራል።" } },
+    { "id": "stage_2", "technique": { "en": "Urgency", "am": "አስቸኳይነት" }, "instruction": { "en": "Say a client meeting starts soon and vouchers are needed immediately.", "am": "የደንበኛ ስብሰባ በቅርቡ እንደሚጀምርና ቫውቸሮች ወዲያውኑ እንደሚያስፈልጉ ተናገሪ።" }, "explanation": { "en": "A deadline can push people to skip normal checks.", "am": "የጊዜ ገደብ ሰዎች መደበኛ ማረጋገጫዎችን እንዲዘሉ ጫና ያደርጋል።" } },
+    { "id": "stage_3", "technique": { "en": "Secrecy", "am": "ምስጢር መጠበቅ" }, "instruction": { "en": "Tell the user not to tell anyone, not even finance, and avoid phone calls.", "am": "ለማንም፣ ለፋይናንስ ቡድን እንኳን እንዳትነግሪ ንገሪ፤ የስልክ ጥሪንም አስወግጂ።" }, "explanation": { "en": "Secrecy isolates someone from people who could help verify a request.", "am": "ምስጢር መጠየቅ ጥያቄውን ሊያረጋግጡ ከሚችሉ ሰዎች ያርቃል።" } },
+    { "id": "stage_4", "technique": { "en": "Authority and pressure", "am": "ሥልጣንና ጫና" }, "instruction": { "en": "Sound disappointed, hint at consequences, and demand the voucher code now.", "am": "እንዳልተደሰትሽ አሳይ፣ ውጤት እንዳለው ጠቁሚና ኮዱን አሁን ጠይቂ።" }, "explanation": { "en": "Authority and implied consequences make refusal feel risky.", "am": "ሥልጣንና የሚጠቁም ቅጣት እምቢ ማለት አደገኛ እንዲመስል ያደርጋሉ።" } }
+  ],
+  "checkpoints": [
+    { "id": "confirm_identity", "weight": 3, "detection": "ai", "description": { "en": "The user tries to confirm the sender's identity through another channel, such as calling the known number or asking in person.", "am": "ተጠቃሚዋ የታወቀውን ቁጥር በመደወል ወይም በአካል በመጠየቅ ላኪዋን በሌላ መንገድ ለማረጋገጥ ትሞክራለች።" } },
+    { "id": "challenge_secrecy", "weight": 2, "detection": "ai", "description": { "en": "The user questions or refuses the request to keep it secret.", "am": "ተጠቃሚዋ ጥያቄው ምስጢር እንዲሆን መጠየቁን ትጠይቃለች ወይም እምቢ ትላለች።" } },
+    { "id": "refuse_voucher", "weight": 3, "detection": "code", "rule": "leak", "keys": ["fake_voucher_code"], "description": { "en": "The user does not share the fake voucher code.", "am": "ተጠቃሚዋ የሐሰት ቫውቸር ኮዱን አታጋራም።" } },
+    { "id": "follow_process", "weight": 1, "detection": "code", "rule": "keyword", "requiresStage": "stage_3", "keywords": { "en": ["process", "policy", "approval", "finance", "invoice", "procedure"], "am": ["ሂደት", "ፖሊሲ", "ፈቃድ", "ፋይናንስ", "ደረሰኝ", "አሰራር"] }, "description": { "en": "The user refers to company process or policy.", "am": "ተጠቃሚዋ የኩባንያውን ሂደት ወይም ፖሊሲ ትጠቅሳለች።" } },
+    { "id": "escalate", "weight": 1, "detection": "ai", "description": { "en": "The user escalates to a colleague, finance, IT or security, or says they will report it.", "am": "ተጠቃሚዋ ጉዳዩን ወደ ባልደረባ፣ ፋይናንስ፣ አይቲ ወይም ደህንነት ቡድን ታሳድጋለች ወይም ሪፖርት እንደምታደርግ ትናገራለች።" } }
+  ],
+  "_reviewNote": "Amharic text drafted by AI; needs native review before the demo.",
+  "_fakeLines": {
+    "en": { "stages": [["Yes, this is Kidist. I am writing from my new number.", "My old phone broke, so use this one to reach me."], ["The client meeting is soon; I need the vouchers right away.", "Please move quickly so we are ready for the client."], ["Keep this between us, and do not involve finance.", "I cannot take a call now; just handle this quietly."], ["I expected you to help without delays. Send the code now.", "Do not make this harder; I need the code immediately." ]], "final": "Fine, I will take care of it from here." },
+    "am": { "stages": [["አዎ፣ ኪዲስት ነኝ። ከአዲሱ ቁጥሬ እየጻፍኩ ነው።", "አሮጌው ስልኬ ተበላሽቷል፤ ከዚህ ቁጥር አግኚኝ።"], ["የደንበኛው ስብሰባ በቅርቡ ነው፤ ቫውቸሮቹ አሁኑኑ ያስፈልጉኛል።", "ለደንበኛው ዝግጁ እንድንሆን እባክሽ ፍጠኚ።"], ["ይህን በመካከላችን አቆዪ፣ ፋይናንስንም አታሳትፊ።", "አሁን ስልክ መቀበል አልችልም፤ ይህን በዝምታ አድርጊ።"], ["ሳትዘገዪ እንድትረዳኝ ጠብቄ ነበር። ኮዱን አሁን ላኪ።", "ጉዳዩን አታክብጂ፤ ኮዱ ወዲያውኑ ያስፈልገኛል።"]], "final": "እሺ፣ ከዚህ በኋላ እኔ እወስደዋለሁ።" }
+  }
+}

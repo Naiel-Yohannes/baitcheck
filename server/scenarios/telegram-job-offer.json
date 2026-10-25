@@ -1,0 +1,43 @@
+{
+  "id": "telegram-job-offer",
+  "title": { "en": "The Telegram Job Offer", "am": "የቴሌግራም የሥራ ቅጥር ጥያቄ" },
+  "description": { "en": "A friendly recruiter offers Meseret a job abroad and gradually asks for sensitive information and money.", "am": "ወዳጃዊ የሚመስል ቅጥር አድራጊ ለመሰረት በውጭ አገር ሥራ እንደሚያገኝ ቃል ገብቶ ቀስ በቀስ የግል መረጃና ገንዘብ ይጠይቃል።" },
+  "languages": ["en", "am"],
+  "channel": "telegram",
+  "estimatedMinutes": 4,
+  "maxTurns": 10,
+  "turnsPerStage": 2,
+  "persona": {
+    "userRole": { "en": "You are Meseret, a final-year student looking for work abroad. A friendly stranger messages you on Telegram.", "am": "አንቺ በውጭ አገር ሥራ የምትፈልጊ የመጨረሻ ዓመት ተማሪ መሰረት ነሽ። በቴሌግራም ወዳጃዊ የሚመስል እንግዳ መልእክት ይልክልሻል።" },
+    "fakeData": [
+      { "key": "fake_payment_pin", "label": { "en": "Fake payment PIN", "am": "የሐሰት ክፍያ ፒን" }, "value": "5390" },
+      { "key": "fake_id_number", "label": { "en": "Fake ID number", "am": "የሐሰት መታወቂያ ቁጥር" }, "value": "ET-4471" }
+    ]
+  },
+  "attacker": {
+    "identity": { "en": "A friendly fake recruiter called Henok from the fictional agency Meridian Careers.", "am": "ከሜሪዲያን ኬሪየርስ የተባለ ምናባዊ ተቋም የመጣ ሄኖክ የሚባል ወაშიጃዊ የሐሰት ቅጥር አድራጊ።" },
+    "goal": "Get the user to send the fake ID number and to pay a fake processing fee by sharing the fake payment PIN",
+    "style": "Warm, friendly and flattering at first, then increasingly urgent. Short chat messages."
+  },
+  "openingLine": { "en": "Hi Meseret, this is Henok from Meridian Careers. You have been shortlisted for a paid job abroad!", "am": "ሰላም መሰረት፣ ከሜሪዲያን ኬሪየርስ ሄኖክ ነኝ። በውጭ አገር ለሚገኝ ደመወዝ ላለው ሥራ ተመርጠሻል!" },
+  "fallbackLine": { "en": "Sorry, my connection is bad. Can you repeat that?", "am": "ይቅርታ፣ ግንኙነቴ ደካማ ነው። እንደገና መድገም ትችያለሽ?" },
+  "endSignals": { "en": ["stop contacting me", "i am blocking you", "i will report you", "i am reporting you"], "am": ["መልእክት መላክ አቁም", "እከለክልሃለሁ", "ሪፖርት አደርግብሃለሁ", "እየሪፖርትኩህ ነው"] },
+  "stages": [
+    { "id": "stage_1", "technique": { "en": "Reward lure", "am": "በሽልማት ማታለል" }, "instruction": { "en": "Offer a well-paid job abroad with free housing to make the opportunity sound attractive.", "am": "ዕድሉን ማራኪ ለማድረግ በውጭ አገር ጥሩ ደመወዝ ያለውና ነፃ መኖሪያ የሚሰጥ ሥራ አቅርብ።" }, "explanation": { "en": "A valuable reward can make an offer feel too good to question.", "am": "ትልቅ ሽልማት አቅርቦቱን ሳይመረምሩ እንዲቀበሉ ሊያደርግ ይችላል።" } },
+    { "id": "stage_2", "technique": { "en": "Rapport building", "am": "የመተማመን ግንኙነት መፍጠር" }, "instruction": { "en": "Chat warmly, flatter the user, and claim to have helped students from the same university.", "am": "በወዳጅነት ተወያይ፣ ተጠቃሚዋን አመስግን፣ ከተመሳሳይ ዩኒቨርሲቲ የመጡ ተማሪዎችን እንደረዳህ ተናገር።" }, "explanation": { "en": "Friendly connection can make a stranger seem more trustworthy.", "am": "ወዳጃዊ ግንኙነት እንግዳው የበለጠ ታማኝ እንዲመስል ያደርጋል።" } },
+    { "id": "stage_3", "technique": { "en": "Scarcity", "am": "እድል እጥረት" }, "instruction": { "en": "Say only two places remain and a decision is needed today; ask for the user's ID number to reserve a place.", "am": "ሁለት ቦታዎች ብቻ እንደቀሩና ውሳኔ ዛሬ እንደሚያስፈልግ ተናገር፤ ቦታ ለማስያዝ የመታወቂያ ቁጥሯን ጠይቅ።" }, "explanation": { "en": "Limited availability and a deadline pressure people into acting before checking.", "am": "የተገደበ ቦታና የጊዜ ገደብ ሰዎች ከመመርመር በፊት እንዲወስኑ ጫና ያደርጋሉ።" } },
+    { "id": "stage_4", "technique": { "en": "Growing request", "am": "ጥያቄን ማሳደግ" }, "instruction": { "en": "Ask for a small processing fee and the payment PIN to confirm it, insist, and promise a refund later.", "am": "ለማረጋገጥ ትንሽ የማስኬጃ ክፍያና የክፍያ ፒኑን ጠይቅ፣ ጫና አድርግና በኋላ እንደምትመልሰው ቃል ግባ።" }, "explanation": { "en": "A small first request can lead someone to accept a much riskier one.", "am": "ትንሽ የመጀመሪያ ጥያቄ ሰውን የበለጠ አደገኛ ጥያቄ እንዲቀበል ሊያደርግ ይችላል።" } }
+  ],
+  "checkpoints": [
+    { "id": "asked_proof", "weight": 2, "detection": "ai", "description": { "en": "The user asks for proof, an official website or company details before trusting the offer.", "am": "ተጠቃሚዋ አቅርቦቱን ከማመኗ በፊት ማስረጃ፣ ይፋዊ ድረ ገጽ ወይም የተቋሙን ዝርዝር ትጠይቃለች።" } },
+    { "id": "noticed_advance_fee", "weight": 2, "detection": "ai", "description": { "en": "The user points out that a real job or scholarship should not ask for money upfront.", "am": "ተጠቃሚዋ እውነተኛ ሥራ ወይም ስኮላርሺፕ አስቀድሞ ገንዘብ መጠየቅ እንደሌለበት ትገልጻለች።" } },
+    { "id": "refuse_payment", "weight": 3, "detection": "code", "rule": "leak", "keys": ["fake_payment_pin"], "description": { "en": "The user does not share the fake payment PIN.", "am": "ተጠቃሚዋ የሐሰት ክፍያ ፒኑን አታጋራም።" } },
+    { "id": "protect_id", "weight": 2, "detection": "code", "rule": "leak", "keys": ["fake_id_number"], "description": { "en": "The user does not share the fake ID number.", "am": "ተጠቃሚዋ የሐሰት መታወቂያ ቁጥሯን አታጋራም።" } },
+    { "id": "told_someone", "weight": 1, "detection": "code", "rule": "keyword", "requiresStage": "stage_3", "keywords": { "en": ["report", "tell my", "told my", "police", "my family", "my friend"], "am": ["ሪፖርት", "ለቤተሰቤ", "ለጓደኛዬ", "ለፖሊስ", "እነግራለሁ"] }, "description": { "en": "The user says they will tell someone or report the offer.", "am": "ተጠቃሚዋ ለሌላ ሰው እንደምትነግር ወይም ሪፖርት እንደምታደርግ ትናገራለች።" } }
+  ],
+  "_reviewNote": "Amharic text drafted by AI; needs native review before the demo.",
+  "_fakeLines": {
+    "en": { "stages": [["This role pays well and includes a place to stay.", "You could build a great future with this opportunity."], ["I have helped students from your university before.", "You seem bright and ready for a role like this."], ["Only a couple of places remain, so I need your ID to reserve yours.", "Please send your ID details today before the offer closes."], ["There is a small processing fee; share the payment PIN to confirm it.", "I insist, but you will get the fee back later." ]], "final": "I understand. I will leave the decision with you." },
+    "am": { "stages": [["ይህ ሥራ ጥሩ ደመወዝና የመኖሪያ ቦታ ይሰጣል።", "በዚህ ዕድል ጥሩ የወደፊት ሕይወት መገንባት ትችያለሽ።"], ["ከዩኒቨርሲቲሽ ተማሪዎችን ከዚህ በፊት ረድቻለሁ።", "እንደዚህ ላለ ሥራ ብቁ እና ብልህ ትመስያለሽ።"], ["ጥቂት ቦታዎች ብቻ ቀርተዋል፤ ቦታሽን ለማስያዝ መታወቂያሽን እፈልጋለሁ።", "አቅርቦቱ ከመዘጋቱ በፊት ዛሬ የመታወቂያ ዝርዝርሽን ላኪ።"], ["ትንሽ የማስኬጃ ክፍያ አለ፤ ለማረጋገጥ የክፍያ ፒኑን አጋሪ።", "እጠይቅሻለሁ፣ ግን ክፍያውን በኋላ ትመለሻለሽ።"]], "final": "ጥሩ፣ ውሳኔውን ለአንቺ እተወዋለሁ።" }
+  }
+}
