@@ -6,6 +6,10 @@ BaitCheck helps people practise spotting social engineering in short, realistic 
 
 Social engineering can lead to security breaches. People need practice responding to suspicious requests, not slides alone. BaitCheck is designed for an Ethiopia facing context: the prototype supports English and Amharic and uses mobile money, Telegram and workplace scenarios.
 
+## 🍿 Video
+
+https://github.com/user-attachments/assets/d61e9d5e-e804-4f6a-8de8-710c2e7f9f86
+
 ## What it does
 
 - Offers short, guided conversations in English or Amharic.
