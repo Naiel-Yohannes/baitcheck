@@ -70,6 +70,31 @@ function lastUserText(history) {
   return undefined
 }
 
+/** Pick a deterministic canned attacker line without applying dev triggers. */
+export function pickScriptedLine({ scenario, language, stageIndex, isFinal, history } = {}) {
+  try {
+    const lang = language === 'am' ? 'am' : 'en'
+    const customLines = scenario?._fakeLines?.[lang]
+    if (isFinal) {
+      return typeof customLines?.final === 'string' && customLines.final.trim()
+        ? customLines.final
+        : CLOSING[lang]
+    }
+
+    const messages = Array.isArray(history) ? history : []
+    const userCount = messages.filter(message => message?.role === 'user').length
+    const customPack = customLines?.stages?.[stageIndex]
+    if (Array.isArray(customPack) && customPack.length > 0 && customPack.every(line => typeof line === 'string')) {
+      return customPack[userCount % customPack.length]
+    }
+
+    const pack = LINES[lang][stageIndex] ?? LINES[lang][0]
+    return pack[userCount % pack.length]
+  } catch {
+    return CLOSING.en
+  }
+}
+
 export function createFakeAi() {
   return {
     async generateReply({ scenario, language, stageIndex, isFinal, history }) {
@@ -77,22 +102,7 @@ export function createFakeAi() {
       if (last === '/503') throw llmBusy()
       if (last === '/502') throw llmFailed()
 
-      const lang = language === 'am' ? 'am' : 'en'
-      const customLines = scenario?._fakeLines?.[lang]
-      if (isFinal) {
-        return typeof customLines?.final === 'string' && customLines.final.trim()
-          ? customLines.final
-          : CLOSING[lang]
-      }
-
-      const userCount = (Array.isArray(history) ? history : []).filter(message => message?.role === 'user').length
-      const customPack = customLines?.stages?.[stageIndex]
-      if (Array.isArray(customPack) && customPack.length > 0 && customPack.every(line => typeof line === 'string')) {
-        return customPack[userCount % customPack.length]
-      }
-
-      const pack = LINES[lang][stageIndex] ?? LINES[lang][0]
-      return pack[userCount % pack.length]
+      return pickScriptedLine({ scenario, language, stageIndex, isFinal, history })
     },
 
     async judgeCheckpoints({ scenario, language, checkpoints, userMessages }) {
