@@ -110,9 +110,9 @@ Ideas listed for future work: prize-message, fake IT helpdesk and online-friend 
 
 ## Team
 
-- Jiregna Dereje
-- Naiel Yohannes
-- Nahom Laikemariam 
-- Nebiyu Amare
-- Yonatan Getachew 
+- Jiregna Dereje   CTC-4151-26
+- Naiel Yohannes    CTC-264-26
+- Nahom Laikemariam    CTC-7614-26
+- Nebiyu Amare    CTC-1104-26
+- Yonatan Getachew   CTC-4561-26
 
