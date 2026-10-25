@@ -1,0 +1,11 @@
+{
+  "name": "baitcheck-server",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "smoke": "node scripts/smoke.js"
+  }
+}
