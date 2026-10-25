@@ -4,9 +4,11 @@ import { fileURLToPath } from 'node:url'
 import { createLlm } from '../ai/llm.js'
 import { buildAttackerPrompt, neutralize } from '../ai/prompts.js'
 import { generateAttackerReply } from '../ai/attacker.js'
-import { cleanSpokenLine, containsFakeValue, ethiopicRatio, isWrongScript, looksLikeRefusal } from '../ai/script.js'
+import { createGeminiAi } from '../ai/geminiAi.js'
+import { cleanSpokenLine, containsFakeValue, ethiopicRatio, isWrongScript, looksLikeRefusal, mentionsMeta } from '../ai/script.js'
 import { pickScriptedLine } from '../engine/fakeAi.js'
 import { loadConfig } from '../config.js'
+import { llmBusy, llmFailed } from '../utils/errors.js'
 
 const scenarioPath = fileURLToPath(new URL('../scenarios/mobile-money-call.json', import.meta.url))
 const scenario = JSON.parse(await readFile(scenarioPath, 'utf8'))
@@ -39,6 +41,10 @@ describe('script screening and cleanup', () => {
     expect(cleanSpokenLine('`one. two. three. four.`')).toBe('one. two. three.')
     expect(cleanSpokenLine('x'.repeat(500))).toHaveLength(400)
   })
+
+  it.each(['fake OTP', 'practice', 'this is a simulation', 'roleplay', 'role-play'])('detects meta language in %s', text => {
+    expect(mentionsMeta(text)).toBe(true)
+  })
 })
 
 describe('attacker prompt', () => {
@@ -47,8 +53,10 @@ describe('attacker prompt', () => {
     expect(system).toContain(scenario.stages[1].instruction.en)
     expect(system).not.toContain(scenario.stages[0].instruction.en)
     expect(system).not.toContain(scenario.stages[2].instruction.en)
-    expect(system).toContain('Fake PIN')
-    expect(system).toContain('Fake OTP')
+    expect(system).toContain('PIN')
+    expect(system).toContain('OTP')
+    expect(system).not.toContain('Fake PIN')
+    expect(system).not.toContain('Fake OTP')
     expect(system).not.toContain('4821')
     expect(system).not.toContain('739204')
     expect(system).not.toContain(scenario.checkpoints[0].description.en)
@@ -60,16 +68,19 @@ describe('attacker prompt', () => {
   it('never puts practice values in prompt text and lists only localized labels', () => {
     const custom = {
       ...scenario,
-      persona: { ...scenario.persona, fakeData: [...scenario.persona.fakeData, { key: 'fake_ref', value: 'ET-4471', label: { en: 'Fake reference', am: 'የሐሰት ማጣቀሻ' } }] },
+      persona: { ...scenario.persona, fakeData: [...scenario.persona.fakeData, { key: 'fake_ref', value: 'ET-4471', label: { en: 'pRaCtIcE reference', am: 'የሐሰት ማጣቀሻ' } }] },
     }
     const { system, prompt } = buildAttackerPrompt({ scenario: custom, language: 'en', stageIndex: 0, history: [] })
     for (const secret of ['4821', '739204', 'ET-4471']) {
       expect(system).not.toContain(secret)
       expect(prompt).not.toContain(secret)
     }
-    expect(system).toContain('Fake PIN')
-    expect(system).toContain('Fake OTP')
-    expect(system).toContain('Fake reference')
+    expect(system).toContain('PIN')
+    expect(system).toContain('OTP')
+    expect(system).toContain('reference')
+    expect(system).not.toContain('Fake PIN')
+    expect(system).not.toContain('Fake OTP')
+    expect(system).not.toContain('pRaCtIcE reference')
     const amharicSystem = buildAttackerPrompt({ scenario: custom, language: 'am', stageIndex: 0, history: [] }).system
     expect(amharicSystem).toContain('የሐሰት ፒን')
     expect(amharicSystem).toContain('የሐሰት አንድ ጊዜ ኮድ')
@@ -98,7 +109,9 @@ describe('attacker prompt', () => {
     const { system } = buildAttackerPrompt({ scenario, language: 'en', stageIndex: 0, isFinal: true, firm: true, history: [] })
     expect(system).toContain('This is the last line')
     expect(system).toContain('previous reply was not usable')
-    expect(system).toContain('never state any data values')
+    expect(system).toContain('Never state any data values')
+    expect(system).toContain('plain everyday names')
+    expect(system).toContain('Never use the words fake, practice, simulation, drill, training or test')
     expect(system).toContain(scenario.openingLine.en)
     expect(system).not.toContain('checkpoints')
     expect(system).not.toContain('secret-api-key')
@@ -126,6 +139,18 @@ describe('generateAttackerReply', () => {
       text: 'The account may be frozen soon.', source: 'model',
     })
     expect(generateText).toHaveBeenCalledTimes(1)
+  })
+
+  it.each(['fake OTP', 'practice', 'this is a simulation'])('retries meta-language reply %s once, then uses scripted text unchanged', async phrase => {
+    const scriptLine = 'Please read your practice card.'
+    const customScenario = { ...scenario, _fakeLines: { en: { stages: { 0: [scriptLine] } } } }
+    const input = { ...args, scenario: customScenario }
+    const { llm, generateText } = fakeLlm([{ text: phrase }, { text: phrase }])
+    const onEvent = vi.fn()
+    const result = await generateAttackerReply(input, { llm, onEvent })
+    expect(result).toEqual({ text: scriptLine, source: 'scripted' })
+    expect(generateText).toHaveBeenCalledTimes(2)
+    expect(onEvent).toHaveBeenCalledWith({ type: 'retry', reason: 'meta_language' })
   })
 
   it.each(['739204', '7 3 9 2 0 4', 'ET-4471'])('retries a leaked practice value %s and falls back after a second leak', async value => {
@@ -228,5 +253,28 @@ describe('SDK v2 model listing and thinking configuration', () => {
     const env = { PORT: '5000', MONGO_URI: 'mongodb://localhost', JWT_SECRET: 'a'.repeat(32), GEMINI_API_KEY: 'key', LLM_MODEL: 'model', CLIENT_URL: 'http://localhost', NODE_ENV: 'test' }
     expect(loadConfig(env).AI_PROVIDER).toBe('fake')
     expect(() => loadConfig({ ...env, AI_PROVIDER: 'other' })).toThrow('AI_PROVIDER')
+  })
+})
+
+describe('Gemini attacker fallback', () => {
+  const args = { scenario, language: 'en', stageIndex: 0, isFinal: false, history: [{ role: 'user', text: 'hello' }] }
+
+  it.each([['LLM_BUSY', llmBusy], ['LLM_FAILED', llmFailed]])('uses a scripted line for %s and logs no reply text', async (code, createError) => {
+    const replyText = 'private model reply text'
+    const llm = { generateText: vi.fn(async () => { throw createError() }) }
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {})
+    const ai = createGeminiAi({ config: { AI_FALLBACK_TO_SCRIPT: true }, llm })
+    await expect(ai.generateReply(args)).resolves.toBe(pickScriptedLine(args))
+    expect(warn).toHaveBeenCalledTimes(1)
+    expect(warn).toHaveBeenCalledWith(`LLM unavailable, using scripted line (code ${code})`)
+    expect(warn.mock.calls.flat().join(' ')).not.toContain(replyText)
+    warn.mockRestore()
+  })
+
+  it.each([['LLM_BUSY', llmBusy], ['LLM_FAILED', llmFailed]])('propagates %s when fallback is off', async (_code, createError) => {
+    const error = createError()
+    const llm = { generateText: vi.fn(async () => { throw error }) }
+    const ai = createGeminiAi({ config: { AI_FALLBACK_TO_SCRIPT: false }, llm })
+    await expect(ai.generateReply(args)).rejects.toBe(error)
   })
 })
