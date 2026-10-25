@@ -9,7 +9,6 @@ function readStoredLang() {
     const stored = localStorage.getItem(STORAGE_KEY)
     if (stored && SUPPORTED.includes(stored)) return stored
   } catch {
-    // localStorage unavailable (private browsing, etc.)
   }
   return 'en'
 }
@@ -18,7 +17,6 @@ function writeStoredLang(lang) {
   try {
     localStorage.setItem(STORAGE_KEY, lang)
   } catch {
-    // ignore
   }
 }
 
@@ -27,7 +25,6 @@ const LanguageContext = createContext(null)
 export function LanguageProvider({ children }) {
   const [lang, setLangState] = useState(readStoredLang)
 
-  // Sync document.documentElement.lang on mount and every change
   useEffect(() => {
     document.documentElement.lang = lang
   }, [lang])
@@ -38,7 +35,6 @@ export function LanguageProvider({ children }) {
     setLangState(next)
   }, [])
 
-  // t(key) → strings[lang][key] → strings.en[key] → key
   const t = useCallback(
     (key) =>
       strings[lang]?.[key] ??

@@ -10,7 +10,8 @@ describe('scenario store', () => {
     const scenario = JSON.parse(await readFile(scenarioFile, 'utf8'))
     const store = createScenarioStore([scenario])
     const [publicScenario] = store.listPublic()
-    expect(Object.keys(publicScenario)).toEqual(['id', 'title', 'description', 'languages', 'channel', 'estimatedMinutes'])
+    expect(Object.keys(publicScenario)).toEqual(['id', 'title', 'description', 'languages', 'channel', 'estimatedMinutes', 'practiceTechniques'])
+    expect(publicScenario.practiceTechniques).toEqual(scenario.stages.map(stage => stage.technique))
     const json = JSON.stringify(publicScenario)
     for (const privateField of ['instruction', 'checkpoints', 'stages', 'goal', 'fakeData', 'openingLine']) {
       expect(json).not.toContain(privateField)

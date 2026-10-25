@@ -1,8 +1,3 @@
-/**
- * server/server.js
- * Entry point: loads config, connects to MongoDB, starts Express.
- * Prints no secrets.
- */
 import 'dotenv/config'
 import { fileURLToPath } from 'node:url'
 import mongoose from 'mongoose'
@@ -16,7 +11,6 @@ import { createFakeAi } from './engine/fakeAi.js'
 import { createLlm } from './ai/llm.js'
 import { createGeminiAi } from './ai/geminiAi.js'
 
-// ── Config ────────────────────────────────────────────────────────
 if (String(process.env.AI_PROVIDER ?? '').trim() === 'gemini'
   && (!String(process.env.GEMINI_API_KEY ?? '').trim() || String(process.env.GEMINI_API_KEY).trim().toLowerCase() === 'placeholder')) {
   console.error('AI_PROVIDER=gemini requires a non-empty GEMINI_API_KEY that is not "placeholder"')
@@ -30,7 +24,6 @@ try {
   process.exit(1)
 }
 
-// ── Scenario data ────────────────────────────────────────────────
 let store
 try {
   const scenariosDir = fileURLToPath(new URL('./scenarios/', import.meta.url))
@@ -45,18 +38,15 @@ try {
   process.exit(1)
 }
 
-// ── Database ──────────────────────────────────────────────────────
 try {
   await mongoose.connect(config.MONGO_URI)
   console.log('MongoDB connected')
   await Promise.all([User.init(), Org.init(), Session.init()])
 } catch {
-  // Never print the URI
   console.error('Could not connect to MongoDB')
   process.exit(1)
 }
 
-// ── HTTP server ───────────────────────────────────────────────────
 let ai
 if (config.AI_PROVIDER === 'gemini') {
   const fallbackAi = createFakeAi()

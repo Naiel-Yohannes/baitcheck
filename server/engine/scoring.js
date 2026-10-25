@@ -78,7 +78,7 @@ export function computeScore(results, scenario) {
   const applicable = (Array.isArray(results) ? results : [])
     .filter(result => result?.status === 'passed' || result?.status === 'failed')
   const totalWeight = applicable.reduce((sum, result) => sum + (weights.get(result.id) ?? 0), 0)
-  if (totalWeight === 0) return 0 // Design choice to confirm: an unjudged session scores zero.
+  if (totalWeight === 0) return 0
   const passedWeight = applicable
     .filter(result => result.status === 'passed')
     .reduce((sum, result) => sum + (weights.get(result.id) ?? 0), 0)

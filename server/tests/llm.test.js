@@ -200,7 +200,6 @@ describe('LLM import and model-name hygiene', () => {
     await scan(root)
     const matches = []
     for (const file of files) {
-      // Local .env is user-managed and may intentionally name the selected model; it is ignored by git.
       if (relative(root, file) === '.env') continue
       if ((await readFile(file, 'utf8')).includes('gemini-')) matches.push(relative(root, file))
     }

@@ -23,7 +23,6 @@ try {
   const store = await loadScenarios(scenariosDir)
   const scenario = store.getById(scenarioId)
   if (!scenario) throw new Error('Scenario not found')
-  // A fresh limiter capped at six includes the SDK's own transient retry attempts.
   const llm = createLlm({ config, maxCalls: 6 })
   const history = []
   for (const learner of learnerLines) {

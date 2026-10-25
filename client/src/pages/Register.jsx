@@ -4,15 +4,12 @@ import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
 import { errorText } from '../errorText'
 
-// ── Constants ─────────────────────────────────────────────────────
 const TYPES = ['individual', 'create', 'join']
 
-// ── Helpers ───────────────────────────────────────────────────────
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
 }
 
-// ── Shared primitives ─────────────────────────────────────────────
 function FieldError({ msg }) {
   if (!msg) return null
   return (
@@ -58,9 +55,8 @@ function InputField({ id, label, type = 'text', autoComplete, value, onChange, d
   )
 }
 
-// ── Success panel for orgAdmin ────────────────────────────────────
 function SuccessPanel({ joinCode, t, onContinue }) {
-  const [copyLabel, setCopyLabel] = useState(null)  // null = default, 'copied' = just copied
+  const [copyLabel, setCopyLabel] = useState(null)
   const timerRef = useRef(null)
 
   useEffect(() => () => clearTimeout(timerRef.current), [])
@@ -71,7 +67,6 @@ function SuccessPanel({ joinCode, t, onContinue }) {
       setCopyLabel('copied')
       timerRef.current = setTimeout(() => setCopyLabel(null), 2000)
     } catch {
-      // clipboard failed — code is still visible and selectable
     }
   }
 
@@ -88,7 +83,6 @@ function SuccessPanel({ joinCode, t, onContinue }) {
 
       {joinCode ? (
         <>
-          {/* Join code — large, prominent, selectable */}
           <div className="bg-gray-800 border border-indigo-700 rounded-2xl px-8 py-6">
             <p
               className="font-mono text-5xl font-bold tracking-[0.25em] text-indigo-300 select-all"
@@ -98,7 +92,6 @@ function SuccessPanel({ joinCode, t, onContinue }) {
             </p>
           </div>
 
-          {/* Copy button */}
           <button
             onClick={handleCopy}
             className="min-h-[44px] px-6 rounded-lg bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium transition-colors"
@@ -110,7 +103,6 @@ function SuccessPanel({ joinCode, t, onContinue }) {
         <p className="max-w-sm text-sm leading-relaxed text-amber-200">{t('registerJoinCodeMissing')}</p>
       )}
 
-      {/* Continue */}
       <button
         onClick={onContinue}
         className="min-h-[44px] px-6 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold transition-colors"
@@ -121,44 +113,42 @@ function SuccessPanel({ joinCode, t, onContinue }) {
   )
 }
 
-// ── Main page ─────────────────────────────────────────────────────
 export default function Register() {
   const { user, register } = useAuth()
   const { t } = useLang()
   const navigate = useNavigate()
   const creatingOrgRef = useRef(false)
 
-  // Account type
   const [accountType, setAccountType] = useState('individual')
 
-  // Fields
-  const [name,     setName]     = useState('')
-  const [email,    setEmail]    = useState('')
-  const [password, setPassword] = useState('')
-  const [orgName,  setOrgName]  = useState('')
-  const [joinCode, setJoinCode] = useState('')
+  const [formValues, setFormValues] = useState({
+    individual: { name: '', email: '', password: '', orgName: '', joinCode: '' },
+    create: { name: '', email: '', password: '', orgName: '', joinCode: '' },
+    join: { name: '', email: '', password: '', orgName: '', joinCode: '' },
+  })
+  const { name, email, password, orgName, joinCode } = formValues[accountType]
 
-  // Errors per field + form-level banner
+  function setField(field, value) {
+    setFormValues(current => ({
+      ...current,
+      [accountType]: { ...current[accountType], [field]: value },
+    }))
+  }
+
   const [errors,  setErrors]  = useState({})
   const [formErr, setFormErr] = useState('')
 
-  // Pending + success state
   const [pending,   setPending]   = useState(false)
-  const [successCode, setSuccessCode] = useState(null) // orgAdmin join code after create
+  const [successCode, setSuccessCode] = useState(null)
 
-  // Switch account type: clear extra fields and all errors
   function switchType(type) {
     setAccountType(type)
-    setOrgName('')
-    setJoinCode('')
     setErrors({})
     setFormErr('')
   }
 
-  // Already-logged-in guard (skip if success panel is showing)
   if (user && successCode === null && !creatingOrgRef.current) return <Navigate to="/scenarios" replace />
 
-  // ── Client-side validation ──────────────────────────────────────
   function validate() {
     const errs = {}
 
@@ -180,7 +170,6 @@ export default function Register() {
     return errs
   }
 
-  // ── Submit ──────────────────────────────────────────────────────
   async function handleSubmit(e) {
     e.preventDefault()
     setFormErr('')
@@ -192,7 +181,6 @@ export default function Register() {
     }
     setErrors({})
 
-    // Build request body with ONLY the fields relevant to the selected type
     const body = {
       name:     name.trim(),
       email:    email.trim(),
@@ -207,14 +195,12 @@ export default function Register() {
       const res = await register(body)
 
       if (creatingOrgRef.current) {
-        // Show the success panel with the returned join code
         setSuccessCode(res.joinCode ?? '')
       } else {
         navigate('/scenarios', { replace: true })
       }
     } catch (err) {
       creatingOrgRef.current = false
-      // Per-field server errors
       if (err.code === 'INVALID_JOIN_CODE') {
         setErrors({ joinCode: t('error_INVALID_JOIN_CODE') })
       } else if (err.code === 'EMAIL_TAKEN') {
@@ -222,7 +208,6 @@ export default function Register() {
       } else if (err.code === 'VALIDATION_ERROR' && Array.isArray(err.details)) {
         const fieldErrs = {}
         for (const { field, issue } of err.details) {
-          // Map known server field names to our local state keys
           const key = field === 'orgName'  ? 'orgName'
                     : field === 'joinCode' ? 'joinCode'
                     : field === 'name'     ? 'name'
@@ -236,11 +221,9 @@ export default function Register() {
         if (Object.keys(fieldErrs).length) {
           setErrors(fieldErrs)
         } else {
-          // Unknown fields — show generic above form
           setFormErr(t('error_VALIDATION_ERROR'))
         }
       } else {
-        // All other errors go above the form
         setFormErr(errorText(err, t))
       }
     } finally {
@@ -248,12 +231,11 @@ export default function Register() {
     }
   }
 
-  // ── Success panel ───────────────────────────────────────────────
   if (successCode !== null) {
     return (
-      <div className="flex items-start justify-center min-h-[80vh] px-4 pt-12 pb-8">
+    <div className="flex items-start justify-center min-h-[80vh] px-2 pt-5 pb-6 sm:px-4 sm:pt-12 sm:pb-8">
         <div className="w-full max-w-md">
-          <div className="bg-gray-900 border border-gray-800 rounded-2xl px-6 py-8 shadow-xl">
+          <div className="bg-gray-900 border border-gray-800 rounded-2xl px-4 py-6 shadow-xl sm:px-6 sm:py-8">
             <SuccessPanel
               joinCode={successCode}
               t={t}
@@ -265,25 +247,22 @@ export default function Register() {
     )
   }
 
-  // ── Type selector buttons ─────────────────────────────────────
   const typeOptions = [
     { value: 'individual', labelKey: 'registerTypeIndividual' },
     { value: 'create',     labelKey: 'registerTypeCreate'     },
     { value: 'join',       labelKey: 'registerTypeJoin'       },
   ]
 
-  // ── Form render ─────────────────────────────────────────────────
   return (
-    <div className="flex items-start justify-center min-h-[80vh] px-4 pt-12 pb-8">
+    <div className="flex items-start justify-center min-h-[80vh] px-2 pt-5 pb-6 sm:px-4 sm:pt-12 sm:pb-8">
       <div className="w-full max-w-md">
-        <div className="bg-gray-900 border border-gray-800 rounded-2xl px-6 py-8 shadow-xl">
+        <div className="bg-gray-900 border border-gray-800 rounded-2xl px-4 py-6 shadow-xl sm:px-6 sm:py-8">
           <h1 className="text-2xl font-bold text-white mb-6">
             {t('headingRegister')}
           </h1>
 
-          {/* Account type selector */}
           <div
-            className="flex rounded-lg bg-gray-800 p-1 mb-6 gap-1"
+            className="flex rounded-lg bg-gray-800 p-1 mb-5 gap-1 sm:mb-6"
             role="group"
             aria-label="Account type"
           >
@@ -292,12 +271,13 @@ export default function Register() {
                 key={value}
                 type="button"
                 onClick={() => switchType(value)}
+                disabled={pending}
                 aria-pressed={accountType === value}
-                className={`flex-1 rounded-md px-2 py-2 text-xs font-semibold transition-colors leading-tight text-center ${
+                className={`min-h-11 flex-1 rounded-md px-1.5 py-2 text-[11px] font-semibold transition-colors leading-tight text-center sm:px-2 sm:text-xs ${
                   accountType === value
                     ? 'bg-indigo-600 text-white shadow'
                     : 'text-gray-400 hover:text-white'
-                }`}
+                } disabled:cursor-not-allowed disabled:opacity-60`}
               >
                 {t(labelKey)}
               </button>
@@ -307,44 +287,40 @@ export default function Register() {
           <FormError msg={formErr} />
 
           <form onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-5">
-            {/* Name */}
             <InputField
               id="reg-name"
               label={t('fieldName')}
               type="text"
               autoComplete="name"
               value={name}
-              onChange={e => { setName(e.target.value); setErrors(v => ({ ...v, name: '' })) }}
+              onChange={e => { setField('name', e.target.value); setErrors(v => ({ ...v, name: '' })) }}
               disabled={pending}
               error={errors.name}
             />
 
-            {/* Email */}
             <InputField
               id="reg-email"
               label={t('fieldEmail')}
               type="email"
               autoComplete="email"
               value={email}
-              onChange={e => { setEmail(e.target.value); setErrors(v => ({ ...v, email: '' })) }}
+              onChange={e => { setField('email', e.target.value); setErrors(v => ({ ...v, email: '' })) }}
               disabled={pending}
               error={errors.email}
               placeholder="you@example.com"
             />
 
-            {/* Password */}
             <InputField
               id="reg-password"
               label={t('fieldPassword')}
               type="password"
               autoComplete="new-password"
               value={password}
-              onChange={e => { setPassword(e.target.value); setErrors(v => ({ ...v, password: '' })) }}
+              onChange={e => { setField('password', e.target.value); setErrors(v => ({ ...v, password: '' })) }}
               disabled={pending}
               error={errors.password}
             />
 
-            {/* Org name — create only */}
             {accountType === 'create' && (
               <InputField
                 id="reg-orgname"
@@ -352,13 +328,12 @@ export default function Register() {
                 type="text"
                 autoComplete="organization"
                 value={orgName}
-                onChange={e => { setOrgName(e.target.value); setErrors(v => ({ ...v, orgName: '' })) }}
+                onChange={e => { setField('orgName', e.target.value); setErrors(v => ({ ...v, orgName: '' })) }}
                 disabled={pending}
                 error={errors.orgName}
               />
             )}
 
-            {/* Join code — join only */}
             {accountType === 'join' && (
               <div>
                 <label
@@ -375,7 +350,7 @@ export default function Register() {
                   maxLength={6}
                   value={joinCode}
                   onChange={e => {
-                    setJoinCode(e.target.value.toUpperCase())
+                    setField('joinCode', e.target.value.toUpperCase())
                     setErrors(v => ({ ...v, joinCode: '' }))
                   }}
                   disabled={pending}
@@ -389,7 +364,6 @@ export default function Register() {
               </div>
             )}
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={pending}
@@ -399,12 +373,10 @@ export default function Register() {
             </button>
           </form>
 
-          {/* Demo notice */}
           <p className="mt-6 text-xs text-gray-500 text-center leading-relaxed">
             {t('demoNotice')}
           </p>
 
-          {/* Link to login */}
           <p className="mt-4 text-center text-sm text-gray-500">
             {t('registerHaveAccount')}{' '}
             <Link

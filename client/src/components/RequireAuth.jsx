@@ -8,7 +8,6 @@ export default function RequireAuth() {
   const { t } = useLang()
   const location = useLocation()
 
-  // ── Still checking ────────────────────────────────────────────
   if (status === 'loading') {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -17,7 +16,6 @@ export default function RequireAuth() {
     )
   }
 
-  // ── Cannot reach server (token exists but network/server failed) ─
   if (authError && !user) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
@@ -34,7 +32,6 @@ export default function RequireAuth() {
     )
   }
 
-  // ── Not logged in ─────────────────────────────────────────────
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location }} />
   }

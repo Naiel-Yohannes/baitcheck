@@ -1,28 +1,4 @@
-/**
- * server/config.js
- * Validates and returns a frozen configuration object from environment variables.
- * loadConfig must not read files or call process.exit.
- */
 
-/**
- * @param {NodeJS.ProcessEnv} env
- * @returns {Readonly<{
- *   PORT: number,
- *   MONGO_URI: string,
- *   JWT_SECRET: string,
- *   GEMINI_API_KEY: string,
- *   LLM_MODEL: string,
- *   CLIENT_URL: string,
- *   NODE_ENV: string,
- *   LLM_MAX_RPM: number,
- *   LLM_TIMEOUT_MS: number,
- *   LLM_THINKING_LEVEL: string|null,
- *   LLM_MODEL_JUDGE: string|null,
- *   AI_PROVIDER: string,
- *   AI_FALLBACK_TO_SCRIPT: boolean,
- *   clientOrigins: string[],
- * }>}
- */
 export function loadConfig(env = process.env) {
   const missing = []
   const invalid = []
@@ -41,7 +17,6 @@ export function loadConfig(env = process.env) {
   }
   const AI_FALLBACK_TO_SCRIPT = fallbackValue === 'true'
 
-  // ── Required string fields ─────────────────────────────────────
   const required = [
     'PORT',
     'MONGO_URI',
@@ -68,18 +43,15 @@ export function loadConfig(env = process.env) {
     )
   }
 
-  // ── PORT must be a positive integer ───────────────────────────
   const PORT = parseInt(values.PORT, 10)
   if (!Number.isInteger(PORT) || PORT <= 0) {
     invalid.push('PORT (must be a positive integer)')
   }
 
-  // ── JWT_SECRET must be at least 32 characters ─────────────────
   if (values.JWT_SECRET.length < 32) {
     invalid.push('JWT_SECRET (must be at least 32 characters)')
   }
 
-  // ── Optional LLM_MAX_RPM: positive integer, default 10 ────────
   let LLM_MAX_RPM = 10
   if (env.LLM_MAX_RPM !== undefined && env.LLM_MAX_RPM !== '') {
     const parsed = parseInt(env.LLM_MAX_RPM, 10)

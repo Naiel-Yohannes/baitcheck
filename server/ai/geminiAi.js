@@ -1,4 +1,3 @@
-// Gemini-backed adapters provide the attacker, checkpoint judge, and feedback writer. fallbackAi is an optional compatibility argument and is not used by the judge or feedback writer.
 import { AppError } from '../utils/errors.js'
 import { pickScriptedLine } from '../engine/fakeAi.js'
 import { generateReply } from './attacker.js'

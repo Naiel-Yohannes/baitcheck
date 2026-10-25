@@ -1,11 +1,6 @@
-/**
- * server/tests/config.test.js
- * Unit tests for loadConfig — no I/O, no process.exit.
- */
 import { describe, expect, it } from 'vitest'
 import { loadConfig } from '../config.js'
 
-// A valid base env that passes all checks
 function validEnv(overrides = {}) {
   return {
     PORT:           '5000',
@@ -33,22 +28,19 @@ describe('loadConfig — missing required variable', () => {
 
   it('does not include the variable value in the error message', () => {
     const env = validEnv()
-    // Sabotage JWT_SECRET so validation fails (too short)
     env.JWT_SECRET = 'tooshort'
 
     let err
     try { loadConfig(env) } catch (e) { err = e }
 
     expect(err).toBeDefined()
-    // The value 'tooshort' must not appear in the message
     expect(err.message).not.toContain('tooshort')
   })
 })
 
 describe('loadConfig — JWT_SECRET length', () => {
   it('rejects a secret shorter than 32 characters', () => {
-    const env = validEnv({ JWT_SECRET: '31-chars-is-not-enough-xxxxxxxxx' }) // 32 chars - 1
-    // Count: "31-chars-is-not-enough-xxxxxxxxx" = 31 chars? let us use exactly 31
+    const env = validEnv({ JWT_SECRET: '31-chars-is-not-enough-xxxxxxxxx' })
     const short = 'a'.repeat(31)
     const env2 = validEnv({ JWT_SECRET: short })
     expect(() => loadConfig(env2)).toThrow()

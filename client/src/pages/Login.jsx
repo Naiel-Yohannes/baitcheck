@@ -4,12 +4,10 @@ import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
 import { errorText } from '../errorText'
 
-// ── Helpers ───────────────────────────────────────────────────────
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
 }
 
-// ── Shared primitives ─────────────────────────────────────────────
 function FieldError({ msg }) {
   if (!msg) return null
   return (
@@ -31,7 +29,6 @@ function FormError({ msg }) {
   )
 }
 
-// ─────────────────────────────────────────────────────────────────
 export default function Login() {
   const { user, login } = useAuth()
   const { t } = useLang()
@@ -40,14 +37,12 @@ export default function Login() {
 
   const [email,    setEmail]    = useState('')
   const [password, setPassword] = useState('')
-  const [errors,   setErrors]   = useState({}) // { email?, password? }
-  const [formErr,  setFormErr]  = useState('')  // banner above form
+  const [errors,   setErrors]   = useState({})
+  const [formErr,  setFormErr]  = useState('')
   const [pending,  setPending]  = useState(false)
 
-  // Already logged-in guard
   if (user) return <Navigate to="/scenarios" replace />
 
-  // ── Client-side validation ──────────────────────────────────────
   function validate() {
     const errs = {}
     if (!isValidEmail(email)) errs.email = t('validEmailRequired')
@@ -55,7 +50,6 @@ export default function Login() {
     return errs
   }
 
-  // ── Submit ──────────────────────────────────────────────────────
   async function handleSubmit(e) {
     e.preventDefault()
     setFormErr('')
@@ -79,11 +73,9 @@ export default function Login() {
     }
   }
 
-  // ── Render ──────────────────────────────────────────────────────
   return (
     <div className="flex items-start justify-center min-h-[80vh] px-4 pt-12 pb-8">
       <div className="w-full max-w-md">
-        {/* Card */}
         <div className="bg-gray-900 border border-gray-800 rounded-2xl px-6 py-8 shadow-xl">
           <h1 className="text-2xl font-bold text-white mb-6">
             {t('headingLogin')}
@@ -92,7 +84,6 @@ export default function Login() {
           <FormError msg={formErr} />
 
           <form onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-5">
-            {/* Email */}
             <div>
               <label
                 htmlFor="login-email"
@@ -117,7 +108,6 @@ export default function Login() {
               <FieldError msg={errors.email} />
             </div>
 
-            {/* Password */}
             <div>
               <label
                 htmlFor="login-password"
@@ -141,7 +131,6 @@ export default function Login() {
               <FieldError msg={errors.password} />
             </div>
 
-            {/* Submit */}
             <button
               type="submit"
               disabled={pending}
@@ -151,7 +140,6 @@ export default function Login() {
             </button>
           </form>
 
-          {/* Link to register */}
           <p className="mt-5 text-center text-sm text-gray-500">
             {t('loginNoAccount')}{' '}
             <Link
