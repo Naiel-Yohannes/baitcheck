@@ -50,20 +50,16 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
 
 function expectStatus(result, status, code) {
   if (result.response.status !== status) {
-    const actualCode = result.data?.error?.code;
-    fail(`HTTP ${result.response.status}${actualCode ? ` ${actualCode}` : ''}`);
+    fail(`HTTP status expected ${status}`);
   }
   if (code && result.data?.error?.code !== code) {
-    fail(`HTTP ${result.response.status} ${result.data?.error?.code || 'unexpected error code'}`);
+    fail(`error.code expected ${code}`);
   }
-  if (!result.data) fail(`HTTP ${result.response.status} invalid JSON`);
+  if (!result.data) fail('response JSON expected');
 }
 
-function expect(condition, result) {
-  if (!condition) {
-    const code = result?.data?.error?.code;
-    fail(result ? `HTTP ${result.response.status}${code ? ` ${code}` : ''}` : 'unexpected response');
-  }
+function expect(condition, assertion) {
+  if (!condition) fail(`${assertion} failed`);
 }
 
 async function check(name, run) {
@@ -73,7 +69,7 @@ async function check(name, run) {
     checks.push(true);
     return true;
   } catch (error) {
-    const reason = error instanceof CheckFailure ? error.reason : 'unexpected failure';
+    const reason = error instanceof CheckFailure ? error.reason : 'request or assertion failed';
     console.log(`FAIL ${name}: ${reason}`);
     checks.push(false);
     return false;
@@ -89,7 +85,7 @@ const earlyStop = async (name) => {
 let ok = await check('health endpoint', async () => {
   const result = await request('/api/health');
   expectStatus(result, 200);
-  expect(result.data.ok === true, result);
+  expect(result.data.ok === true, 'health.ok');
 });
 if (!ok) {
   await earlyStop('health endpoint');
@@ -105,7 +101,7 @@ if (!ok) {
     });
     expectStatus(result, 201);
     token = result.data.token;
-    expect(typeof token === 'string' && result.data.user?.role === 'individual' && !('joinCode' in result.data), result);
+    expect(typeof token === 'string' && result.data.user?.role === 'individual' && !('joinCode' in result.data), 'token, user.role, joinCode absence');
   });
   if (!ok) {
     await earlyStop('register individual account');
@@ -120,22 +116,22 @@ if (!ok) {
     await check('login succeeds', async () => {
       const result = await request('/api/auth/login', { method: 'POST', body: { email, password } });
       expectStatus(result, 200);
-      expect(typeof result.data.token === 'string', result);
+      expect(typeof result.data.token === 'string', 'token');
       token = result.data.token;
     });
 
     await check('current user matches', async () => {
       const result = await request('/api/auth/me', { auth: true });
       expectStatus(result, 200);
-      expect(result.data.user?.email === email || result.data.email === email, result);
+      expect(result.data.user?.email === email || result.data.email === email, 'user.email');
     });
 
     await check('scenario list hides private fields', async () => {
       const result = await request('/api/scenarios', { auth: true });
       expectStatus(result, 200);
       const scenarios = result.data.scenarios;
-      expect(Array.isArray(scenarios) && scenarios.some((scenario) => scenario.id === 'mobile-money-call'), result);
-      expect(scenarios.every((scenario) => !['stages', 'checkpoints', 'instruction', 'persona'].some((key) => key in scenario)), result);
+      expect(Array.isArray(scenarios) && scenarios.some((scenario) => scenario.id === 'mobile-money-call'), 'scenarios includes mobile-money-call');
+      expect(scenarios.every((scenario) => !['stages', 'checkpoints', 'instruction', 'persona'].some((key) => key in scenario)), 'scenario private keys absent');
     });
 
     await check('session starts', async () => {
@@ -145,7 +141,7 @@ if (!ok) {
       expectStatus(result, 201);
       sessionId = result.data.sessionId;
       expect(typeof sessionId === 'string' && Array.isArray(result.data.persona?.fakeData) &&
-        typeof result.data.firstMessage === 'string' && result.data.firstMessage.length > 0 && result.data.turnCount === 0, result);
+        typeof result.data.firstMessage === 'string' && result.data.firstMessage.length > 0 && result.data.turnCount === 0, 'sessionId, persona.fakeData, firstMessage, turnCount');
     });
 
     await check('unsupported language rejected', async () => {
@@ -160,7 +156,7 @@ if (!ok) {
         method: 'POST', auth: true, body: { text: 'Who are you? I will verify with the official app' },
       });
       expectStatus(result, 200);
-      expect(typeof result.data.reply === 'string' && result.data.reply.length > 0 && result.data.turnCount === 1 && result.data.warning === null, result);
+      expect(typeof result.data.reply === 'string' && result.data.reply.length > 0 && result.data.turnCount === 1 && result.data.warning === null, 'reply, turnCount, warning');
     });
 
     await check('long digit message is blocked', async () => {
@@ -168,15 +164,18 @@ if (!ok) {
         method: 'POST', auth: true, body: { text: 'my number is 0911223344' },
       });
       expectStatus(result, 200);
-      expect(result.data.reply === null && result.data.warning?.code === 'LONG_DIGITS' && result.data.turnCount === 1, result);
+      expect(result.data.reply === null && result.data.warning?.code === 'LONG_DIGITS' && result.data.turnCount === 1, 'reply, warning.code, turnCount');
     });
 
     await check('session messages are public-safe', async () => {
       const result = await request(`/api/sessions/${encodeURIComponent(sessionId || 'missing-session-id')}`, { auth: true });
       expectStatus(result, 200);
-      expect(Array.isArray(result.data.messages) && result.data.messages.length === 3 &&
-        result.data.messages.every((message) => Object.keys(message).every((key) => ['role', 'text'].includes(key))) &&
-        result.data.turnCount === 1 && result.data.report === null, result);
+      const session = result.data.session;
+      expect(Array.isArray(session?.messages) && session.messages.length === 3 &&
+        session.messages.every((message) => Object.keys(message).length === 2 &&
+          Object.keys(message).every((key) => ['role', 'text'].includes(key))), 'session.messages length and keys');
+      expect(session?.turnCount === 1, 'session.turnCount');
+      expect(session?.report === null, 'session.report');
     });
 
     await check('hangup ends the session', async () => {
@@ -184,7 +183,7 @@ if (!ok) {
         method: 'POST', auth: true, body: { text: 'I will hang up now' },
       });
       expectStatus(result, 200);
-      expect(result.data.ended === true && typeof result.data.reply === 'string' && result.data.reply.length > 0, result);
+      expect(result.data.ended === true && typeof result.data.reply === 'string' && result.data.reply.length > 0, 'ended, reply');
     });
 
     await check('finished session rejects messages', async () => {
@@ -203,7 +202,7 @@ if (!ok) {
       expect(Number.isInteger(report?.score) && report.score >= 0 && report.score <= 100 &&
         ['vulnerable', 'partial', 'resilient', 'strong'].includes(report.band) &&
         Array.isArray(report.checkpoints) && report.checkpoints.length === 4 &&
-        Array.isArray(report.timeline) && report.timeline.length > 0, result);
+        Array.isArray(report.timeline) && report.timeline.length > 0, 'report.score, report.band, report.checkpoints, report.timeline');
       originalReport = report;
     });
 
@@ -212,7 +211,7 @@ if (!ok) {
         method: 'POST', auth: true,
       });
       expectStatus(result, 200);
-      expect(JSON.stringify(result.data.report) === JSON.stringify(originalReport), result);
+      expect(JSON.stringify(result.data.report) === JSON.stringify(originalReport), 'report idempotency');
     });
 
     await check('my sessions omit private data', async () => {
@@ -221,13 +220,14 @@ if (!ok) {
       const sessions = result.data.sessions;
       const session = Array.isArray(sessions) && sessions.find((item) => item.id === sessionId || item._id === sessionId);
       expect(session?.status === 'finished' && typeof session.score === 'number' &&
-        !('messages' in session) && !('report' in session), result);
+        !('messages' in session) && !('report' in session), 'session.status, session.score, messages/report absence');
     });
 
     await check('session report is available after finishing', async () => {
       const result = await request(`/api/sessions/${encodeURIComponent(sessionId || 'missing-session-id')}`, { auth: true });
       expectStatus(result, 200);
-      expect(result.data.report !== null && result.data.report !== undefined, result);
+      const report = result.data.session?.report;
+      expect(report !== null && typeof report === 'object' && Number.isInteger(report.score), 'session.report and session.report.score');
     });
 
     await check('organization summary is forbidden', async () => {

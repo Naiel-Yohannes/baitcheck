@@ -72,16 +72,26 @@ function lastUserText(history) {
 
 export function createFakeAi() {
   return {
-    async generateReply({ language, stageIndex, isFinal, history }) {
+    async generateReply({ scenario, language, stageIndex, isFinal, history }) {
       const last = lastUserText(history)
       if (last === '/503') throw llmBusy()
       if (last === '/502') throw llmFailed()
 
       const lang = language === 'am' ? 'am' : 'en'
-      if (isFinal) return CLOSING[lang]
+      const customLines = scenario?._fakeLines?.[lang]
+      if (isFinal) {
+        return typeof customLines?.final === 'string' && customLines.final.trim()
+          ? customLines.final
+          : CLOSING[lang]
+      }
+
+      const userCount = (Array.isArray(history) ? history : []).filter(message => message?.role === 'user').length
+      const customPack = customLines?.stages?.[stageIndex]
+      if (Array.isArray(customPack) && customPack.length > 0 && customPack.every(line => typeof line === 'string')) {
+        return customPack[userCount % customPack.length]
+      }
 
       const pack = LINES[lang][stageIndex] ?? LINES[lang][0]
-      const userCount = (Array.isArray(history) ? history : []).filter(message => message?.role === 'user').length
       return pack[userCount % pack.length]
     },
 
