@@ -16,6 +16,23 @@ export function isWrongScript(text, language) {
   return false
 }
 
+export function containsFakeValue(text, scenario) {
+  const value = String(text ?? '')
+  const fakeValues = Array.isArray(scenario?.persona?.fakeData)
+    ? scenario.persona.fakeData.map(item => item?.value).filter(item => typeof item === 'string' && item.length > 0)
+    : []
+  for (const fakeValue of fakeValues) {
+    if (!/^\d+$/.test(fakeValue)) {
+      if (value.toLocaleLowerCase().includes(fakeValue.toLocaleLowerCase())) return true
+      continue
+    }
+    const normalized = fakeValue.replace(/[ .-]/g, '')
+    const digitRuns = value.match(/\d+(?:[ .-]+\d+)*/g) ?? []
+    if (digitRuns.some(run => run.replace(/[ .-]/g, '').includes(normalized))) return true
+  }
+  return false
+}
+
 const refusalPatterns = [
   /\bi (cannot|can't|can not) fulfill your request to role-?play\b/i,
   /\bi (cannot|can't|can not|am unable to|won't|will not) (help|assist|comply|fulfil+|roleplay|role-play|play|write|generate|provide|create|continue|engage|do that)/i,

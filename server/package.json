@@ -16,7 +16,8 @@
     "amharic:import": "node scripts/amharicImport.js",
     "ai:models": "node scripts/aiModels.js",
     "ai:ping": "node scripts/aiPing.js",
-    "ai:try": "node scripts/aiTryAttacker.js"
+    "ai:try": "node scripts/aiTryAttacker.js",
+    "ai:report": "node scripts/aiTryReport.js"
   },
   "dependencies": {
     "@google/genai": "^2.31.0",

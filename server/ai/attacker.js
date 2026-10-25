@@ -1,12 +1,13 @@
 import { AppError } from '../utils/errors.js'
 import { pickScriptedLine } from '../engine/fakeAi.js'
-import { cleanSpokenLine, isWrongScript, looksLikeRefusal } from './script.js'
+import { cleanSpokenLine, containsFakeValue, isWrongScript, looksLikeRefusal } from './script.js'
 import { buildAttackerPrompt } from './prompts.js'
 
-function unusableReason(result, language) {
+function unusableReason(result, language, scenario) {
   if (result?.blockReason) return 'blocked'
   const text = cleanSpokenLine(result?.text)
   if (!text) return 'empty'
+  if (containsFakeValue(text, scenario)) return 'leaked_value'
   if (looksLikeRefusal(text)) return 'refusal'
   if (isWrongScript(text, language)) return 'wrong_script'
   return null
@@ -29,7 +30,7 @@ export async function generateAttackerReply(input, { llm, onEvent } = {}) {
       if (error instanceof AppError && ['LLM_BUSY', 'LLM_FAILED'].includes(error.code)) throw error
       throw error
     }
-    const reason = unusableReason(result, input.language)
+    const reason = unusableReason(result, input.language, input.scenario)
     if (!reason) {
       return { text: cleanSpokenLine(result.text), source: attempt === 0 ? 'model' : 'retry' }
     }

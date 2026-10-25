@@ -37,9 +37,10 @@ function withCause(mappedError, cause) {
   return mappedError
 }
 
-export function createLlm({ config, client, now = Date.now, sleep = sleepDefault }) {
+export function createLlm({ config, client, now = Date.now, sleep = sleepDefault, maxCalls = Infinity }) {
   let sdkClient = client
   const callTimestamps = []
+  let totalCalls = 0
 
   function getClient() {
     if (!sdkClient) sdkClient = new GoogleGenAI({ apiKey: config.GEMINI_API_KEY })
@@ -58,7 +59,8 @@ export function createLlm({ config, client, now = Date.now, sleep = sleepDefault
 
   async function providerAttempt({ model, prompt, system, temperature, maxOutputTokens, json }) {
     pruneTimestamps()
-    if (callTimestamps.length >= config.LLM_MAX_RPM) throw llmBusy()
+    if (callTimestamps.length >= config.LLM_MAX_RPM || totalCalls >= maxCalls) throw llmBusy()
+    totalCalls += 1
     callTimestamps.push(now())
 
     const requestConfig = { systemInstruction: system, temperature, maxOutputTokens }

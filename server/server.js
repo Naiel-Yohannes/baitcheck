@@ -61,7 +61,7 @@ let ai
 if (config.AI_PROVIDER === 'gemini') {
   const fallbackAi = createFakeAi()
   ai = createGeminiAi({ config, llm: createLlm({ config }), fallbackAi })
-  console.log(`AI provider: gemini (model ${config.LLM_MODEL}) - attacker only, judge and feedback are still fake`)
+  console.log(`AI provider: gemini (model ${config.LLM_MODEL}) - attacker, judge and feedback`)
 } else {
   ai = createFakeAi()
   console.log('WARNING: using the FAKE attacker (no real AI connected)')

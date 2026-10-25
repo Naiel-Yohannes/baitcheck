@@ -1,10 +1,14 @@
-// Gemini powers attacker dialogue only for now; the judge and feedback remain the existing deterministic fake implementations.
+// Gemini-backed adapters provide the attacker, checkpoint judge, and feedback writer. fallbackAi is an optional compatibility argument and is not used by the judge or feedback writer.
 import { generateReply } from './attacker.js'
+import { createJudge } from './judge.js'
+import { createFeedbackWriter } from './feedbackAi.js'
 
-export function createGeminiAi({ config, llm, fallbackAi }) {
+export function createGeminiAi({ config, llm, fallbackAi: _fallbackAi } = {}) {
+  const judgeCheckpoints = createJudge({ llm, config })
+  const generateFeedback = createFeedbackWriter({ llm, config })
   return {
     generateReply: input => generateReply(input, { llm }),
-    judgeCheckpoints: input => fallbackAi.judgeCheckpoints(input),
-    generateFeedback: input => fallbackAi.generateFeedback(input),
+    judgeCheckpoints,
+    generateFeedback,
   }
 }
