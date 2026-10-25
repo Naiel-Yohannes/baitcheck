@@ -18,7 +18,7 @@ function isQuotaError(error, status) {
 function isTransient(error, status) {
   if (error?.code === 'LLM_TIMEOUT') return true
   if (status !== null) return [500, 502, 503, 504].includes(status)
-  return true // Errors without an HTTP status are network or transport failures.
+  return true
 }
 
 function parseJsonText(value) {
@@ -66,7 +66,6 @@ export function createLlm({ config, client, now = Date.now, sleep = sleepDefault
     const requestConfig = { systemInstruction: system, temperature, maxOutputTokens }
     if (json) requestConfig.responseMimeType = 'application/json'
     const thinkingLevels = { minimal: 'minimal', low: 'low', medium: 'medium', high: 'high' }
-    // A legacy injected test client may not implement the SDK v2 models surface.
     const supportsSdkV2 = !client || typeof getClient().models?.list === 'function'
     if (supportsSdkV2 && thinkingLevels[config.LLM_THINKING_LEVEL]) {
       requestConfig.thinkingConfig = { thinkingLevel: thinkingLevels[config.LLM_THINKING_LEVEL] }

@@ -1,6 +1,5 @@
 import { cut, escapeRegExp, isDigitsOnly, stripDigitSeparators } from './text.js'
 
-// Amharic copy is a temporary draft and needs review by a native speaker.
 export const WARNING_MESSAGES = {
   en: {
     LONG_DIGITS: 'That looks like a real number. Please use only the fake data on your card.',

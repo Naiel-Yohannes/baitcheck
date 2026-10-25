@@ -151,7 +151,6 @@ export function validateScenario(scenario) {
     }
     if (checkpoints.length > 0 && !hasUnstagedCheckpoint) add('at least one checkpoint must not have requiresStage')
   } catch {
-    // Validation is a boundary check: malformed values should become problems, never exceptions.
     if (problems.length === 0) add('scenario could not be validated')
   }
 

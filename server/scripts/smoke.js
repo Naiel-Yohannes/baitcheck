@@ -38,7 +38,6 @@ async function request(path, { method = 'GET', body, auth = false } = {}) {
     try {
       data = await response.json();
     } catch {
-      // Keep malformed or non-JSON bodies private; checks report only status/code.
     }
     return { response, data };
   } catch (error) {

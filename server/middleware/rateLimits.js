@@ -1,12 +1,6 @@
 import { rateLimit } from 'express-rate-limit'
 import { rateLimited } from '../utils/errors.js'
 
-/*
- * Future sessions routes should apply these in this order:
- * router.post('/', requireAuth, startSessionLimiter, ...)
- * router.post('/:id/message', requireAuth, messageLimiter, ...)
- * router.post('/:id/finish', requireAuth, finishLimiter, ...)
- */
 
 export const RATE_LIMIT_DEFAULTS = Object.freeze({
   globalLimiter: Object.freeze({ windowMs: 60 * 1000, limit: 100 }),

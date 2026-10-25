@@ -1,7 +1,6 @@
 const LETTER = /\p{L}/gu
 const ETHIOPIC_LETTER = /[\u1200-\u137F]/u
 
-// Amharic equivalents need native review.
 export function mentionsMeta(text) {
   return /\b(fake|practice|simulat\w*|drill|training|role-?play)\b/i.test(String(text ?? ''))
 }

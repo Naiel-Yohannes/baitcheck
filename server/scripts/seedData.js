@@ -3,7 +3,6 @@ export const DEMO_PASSWORD = 'DemoPass123'
 export const DEMO_JOIN_CODE = 'BEAT42'
 export const DEMO_ORG_NAME = 'Demo Org'
 
-// These ids and texts must match the scenario files when they exist.
 export const SCENARIOS = {
   'mobile-money-call': {
     id: 'mobile-money-call',
@@ -76,7 +75,6 @@ export const SCENARIOS = {
   },
 }
 
-// Temporary copies of the engine evaluator functions; replace with evaluator.js imports once it exists.
 export function bandForScore(score) {
   if (score < 40) return 'vulnerable'
   if (score < 70) return 'partial'

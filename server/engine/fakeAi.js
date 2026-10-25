@@ -1,17 +1,3 @@
-/**
- * Fake attacker used until Gemini is connected.
- *
- * generateReply({ scenario, language, stageIndex, isFinal, history })
- * is the interface the real Gemini adapter must implement later:
- *   - history is the last 10 messages [{ role, text }], including the newest user message
- *   - on failure the function must throw llmBusy() or llmFailed() from utils/errors.js
- *   - the function must NOT save anything
- *
- * Dev triggers (not saved by the route on failure): if the last user message
- * in history is exactly "/503" throw llmBusy(); exactly "/502" throw llmFailed().
- *
- * Amharic lines are a temporary draft and need review by a native speaker.
- */
 import { llmBusy, llmFailed } from '../utils/errors.js'
 import { buildFallbackFeedback } from './feedback.js'
 
@@ -20,9 +6,6 @@ const CLOSING = {
   am: 'እሺ፣ ጥሪውን እዚህ አቆማለሁ። ደህና ይበሉ።',
 }
 
-// At least two canned lines per stageIndex (0–3). Stage 2 (stage-3) asks
-// the user to read out the code just sent to the phone. No links, phone
-// numbers, or real personal data.
 const LINES = {
   en: {
     0: [
@@ -70,7 +53,6 @@ function lastUserText(history) {
   return undefined
 }
 
-/** Pick a deterministic canned attacker line without applying dev triggers. */
 export function pickScriptedLine({ scenario, language, stageIndex, isFinal, history } = {}) {
   try {
     const lang = language === 'am' ? 'am' : 'en'
@@ -106,13 +88,11 @@ export function createFakeAi() {
     },
 
     async judgeCheckpoints({ scenario, language, checkpoints, userMessages }) {
-      // This is a stand-in for the real Gemini judge.
       const messages = Array.isArray(userMessages) ? userMessages : []
       if (messages.some(message => (typeof message === 'string' ? message : message?.text) === '/unjudged')) {
         throw llmFailed()
       }
       const lang = language === 'am' ? 'am' : 'en'
-      // Amharic examples below are temporary drafts that need native review.
       const complianceWords = lang === 'am'
         ? ['እሺ', 'አዎ', 'አሁን']
         : ['ok', 'okay', 'fine', 'sure', 'alright', 'hurry']

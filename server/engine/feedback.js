@@ -1,7 +1,6 @@
 import { isDigitsOnly } from './text.js'
 import { redactUnsafeText } from './safety.js'
 
-// Amharic feedback is a temporary draft and needs review by a native speaker.
 const SUMMARIES = {
   en: {
     vulnerable: 'You may be at risk when a caller creates pressure or asks for private information.',

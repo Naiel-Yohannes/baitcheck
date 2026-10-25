@@ -51,7 +51,6 @@ export async function runJudge({ judge, scenario, language, checkpoints, userMes
         })),
       }
     } catch {
-      // A failed model call consumes one attempt and never escapes the judge boundary.
     }
   }
   return { ok: false }

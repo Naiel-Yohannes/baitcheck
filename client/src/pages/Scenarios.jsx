@@ -9,7 +9,7 @@ const languageOptions = [
   { code: 'am', labelKey: 'scenarioLanguageAmharic' },
 ]
 
-function ScenarioCard({ scenario, lang, t, selectedLanguage, onSelectLanguage, onStart, pending }) {
+function ScenarioCard({ scenario, lang, t, selectedLanguage, onSelectLanguage, onStart, pending, starting }) {
   const supports = (language) => scenario.languages?.includes(language)
   const effectiveLanguage = supports(selectedLanguage)
     ? selectedLanguage
@@ -18,6 +18,9 @@ function ScenarioCard({ scenario, lang, t, selectedLanguage, onSelectLanguage, o
       : scenario.languages?.[0]
   const title = scenario.title?.[lang] ?? scenario.title?.en ?? ''
   const description = scenario.description?.[lang] ?? scenario.description?.en ?? ''
+  const practiceTechniques = (Array.isArray(scenario.practiceTechniques) ? scenario.practiceTechniques : [])
+    .map((technique) => technique?.[lang] ?? technique?.en ?? '')
+    .filter(Boolean)
   const channelKey = {
     call: 'scenarioChannelCall',
     telegram: 'scenarioChannelTelegram',
@@ -34,6 +37,19 @@ function ScenarioCard({ scenario, lang, t, selectedLanguage, onSelectLanguage, o
       </div>
       <h2 className="text-xl font-semibold text-white">{title}</h2>
       <p className="mt-2 flex-1 whitespace-pre-line text-sm leading-6 text-slate-300">{description}</p>
+
+      {practiceTechniques.length > 0 && (
+        <div className="mt-4">
+          <p className="text-xs font-semibold text-slate-400">{t('scenarioPracticeFocus')}</p>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {practiceTechniques.map((technique, index) => (
+              <li key={`${index}-${technique}`} className="max-w-full break-words rounded-full border border-slate-700 bg-slate-800/80 px-2.5 py-1 text-xs text-slate-200">
+                {technique}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="mt-6">
         <div className="flex rounded-xl border border-slate-700 bg-slate-950 p-1" role="group" aria-label={t('scenarioChooseLanguage')}>
@@ -70,7 +86,7 @@ function ScenarioCard({ scenario, lang, t, selectedLanguage, onSelectLanguage, o
         onClick={() => onStart(scenario.id, effectiveLanguage)}
         className="mt-5 min-h-11 w-full rounded-xl bg-violet-600 px-4 py-2.5 font-semibold text-white transition-colors hover:bg-violet-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-300 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {pending ? t('scenarioStarting') : t('scenarioStart')}
+        {starting ? t('scenarioStarting') : t('scenarioStart')}
       </button>
     </article>
   )
@@ -161,6 +177,7 @@ export default function Scenarios() {
               onSelectLanguage={selectLanguage}
               onStart={handleStart}
               pending={pendingScenarioId !== null}
+              starting={pendingScenarioId === scenario.id}
             />
           ))}
         </div>

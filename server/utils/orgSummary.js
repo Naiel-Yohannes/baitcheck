@@ -17,15 +17,6 @@ function meanRounded(scores) {
   return Math.round(sum / scores.length)
 }
 
-/**
- * Pure organization summary. No database access.
- * @param {{
- *   org: { name: string, joinCode: string },
- *   employees: Array<{ id: string, name: string }>,
- *   sessions: Array<{ userId: string, scenarioId: string, language: string, score: unknown, band: unknown, finishedAt: Date|string }>,
- *   getScenarioTitle: (scenarioId: string, language: string) => string
- * }} args
- */
 export function buildOrgSummary({ org, employees, sessions, getScenarioTitle }) {
   const employeeIds = new Set(employees.map(employee => employee.id))
   const countedByUser = new Map(employees.map(employee => [employee.id, []]))

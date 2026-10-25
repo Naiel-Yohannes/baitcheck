@@ -26,6 +26,9 @@ export function createScenarioStore(scenarios) {
         languages: scenario.languages,
         channel: scenario.channel,
         estimatedMinutes: scenario.estimatedMinutes,
+        practiceTechniques: Array.isArray(scenario.stages)
+          ? scenario.stages.map(stage => stage?.technique).filter(Boolean)
+          : [],
       }))
     },
     getTitle(id, language) {
