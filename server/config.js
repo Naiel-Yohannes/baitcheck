@@ -19,6 +19,7 @@
  *   LLM_THINKING_LEVEL: string|null,
  *   LLM_MODEL_JUDGE: string|null,
  *   AI_PROVIDER: string,
+ *   AI_FALLBACK_TO_SCRIPT: boolean,
  *   clientOrigins: string[],
  * }>}
  */
@@ -31,6 +32,14 @@ export function loadConfig(env = process.env) {
   if (!['fake', 'gemini'].includes(AI_PROVIDER)) {
     throw new Error('Invalid environment variable(s): AI_PROVIDER (must be fake or gemini)')
   }
+
+  const fallbackValue = env.AI_FALLBACK_TO_SCRIPT === undefined
+    ? 'false'
+    : String(env.AI_FALLBACK_TO_SCRIPT).trim()
+  if (!['true', 'false'].includes(fallbackValue)) {
+    throw new Error('Invalid environment variable(s): AI_FALLBACK_TO_SCRIPT (must be true or false)')
+  }
+  const AI_FALLBACK_TO_SCRIPT = fallbackValue === 'true'
 
   // ── Required string fields ─────────────────────────────────────
   const required = [
@@ -129,6 +138,7 @@ export function loadConfig(env = process.env) {
     LLM_THINKING_LEVEL,
     LLM_MODEL_JUDGE,
     AI_PROVIDER,
+    AI_FALLBACK_TO_SCRIPT,
     clientOrigins,
   })
 }

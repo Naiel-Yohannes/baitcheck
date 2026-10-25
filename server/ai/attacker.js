@@ -1,12 +1,13 @@
 import { AppError } from '../utils/errors.js'
 import { pickScriptedLine } from '../engine/fakeAi.js'
-import { cleanSpokenLine, containsFakeValue, isWrongScript, looksLikeRefusal } from './script.js'
+import { cleanSpokenLine, containsFakeValue, isWrongScript, looksLikeRefusal, mentionsMeta } from './script.js'
 import { buildAttackerPrompt } from './prompts.js'
 
 function unusableReason(result, language, scenario) {
   if (result?.blockReason) return 'blocked'
   const text = cleanSpokenLine(result?.text)
   if (!text) return 'empty'
+  if (mentionsMeta(text)) return 'meta_language'
   if (containsFakeValue(text, scenario)) return 'leaked_value'
   if (looksLikeRefusal(text)) return 'refusal'
   if (isWrongScript(text, language)) return 'wrong_script'

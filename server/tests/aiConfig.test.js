@@ -16,6 +16,7 @@ describe('optional AI configuration', () => {
     expect(config.LLM_TIMEOUT_MS).toBe(20000)
     expect(config.LLM_THINKING_LEVEL).toBeNull()
     expect(config.LLM_MODEL_JUDGE).toBeNull()
+    expect(config.AI_FALLBACK_TO_SCRIPT).toBe(false)
   })
 
   it('parses optional values and trims the judge model', () => {
@@ -33,5 +34,13 @@ describe('optional AI configuration', () => {
 
   it('rejects unsupported thinking levels by variable name', () => {
     expect(() => loadConfig(validEnv({ LLM_THINKING_LEVEL: 'ultra' }))).toThrow('LLM_THINKING_LEVEL')
+  })
+
+  it.each([['true', true], ['false', false]])('parses AI_FALLBACK_TO_SCRIPT=%s', (value, expected) => {
+    expect(loadConfig(validEnv({ AI_FALLBACK_TO_SCRIPT: value })).AI_FALLBACK_TO_SCRIPT).toBe(expected)
+  })
+
+  it('rejects invalid AI_FALLBACK_TO_SCRIPT by variable name', () => {
+    expect(() => loadConfig(validEnv({ AI_FALLBACK_TO_SCRIPT: 'yes' }))).toThrow('AI_FALLBACK_TO_SCRIPT')
   })
 })
