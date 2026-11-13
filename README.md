@@ -1,5 +1,7 @@
 # BaitCheck
 
+[![CI](https://github.com/Naiel-Yohannes/baitcheck/actions/workflows/ci.yml/badge.svg)](https://github.com/Naiel-Yohannes/baitcheck/actions/workflows/ci.yml)
+
 BaitCheck helps people practise spotting social engineering in short, realistic conversations.
 
 ## The problem
@@ -29,13 +31,12 @@ Social engineering can lead to security breaches. People need practice respondin
 
 Stages, safety checks, code based checkpoints and score calculation are controlled by ordinary server code. The AI writes attacker lines, judges language dependent checkpoints and writes feedback. Code combines checkpoint results into the score. The score and report are stored when the session is finished; the AI does not calculate or recalculate the score.
 
-```text
-React + Vite client
-        │ HTTPS / JSON
-        ▼
-Express API ───── MongoDB
-        │
-        └── server/ai/llm.js ─── Gemini API (when AI_PROVIDER=gemini)
+```mermaid
+flowchart LR
+    Client[React + Vite client] <-->|HTTPS / JSON| API[Express API]
+    API <--> MongoDB[(MongoDB)]
+    API --> LLM[server/ai/llm.js]
+    LLM -->|when AI_PROVIDER=gemini| Gemini[Gemini API]
 ```
 
 ## Safety by design
