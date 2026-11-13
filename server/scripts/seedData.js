@@ -186,19 +186,45 @@ export const DEMO_PLAN = {
     {
       key: 'hana', name: 'Hana Girma', email: `hana@${DEMO_EMAIL_DOMAIN}`, role: 'employee', inOrg: true,
       sessions: [
-        plannedSession('mobile-money-call', 100, 'scenario_complete', 23),
-        plannedSession('telegram-job-offer', 60, 'end_signal', 17, 6),
+        plannedSession('mobile-money-call', 40, 'user_button', 54),
+        plannedSession('mobile-money-call', 80, 'scenario_complete', 27),
+        plannedSession('telegram-job-offer', 20, 'end_signal', 48, 6),
         plannedSession('boss-favor', 20, 'max_turns', 9, 8),
       ],
     },
     {
       key: 'selam', name: 'Selam Tadesse', email: `selam@${DEMO_EMAIL_DOMAIN}`, role: 'employee', inOrg: true,
       sessions: [
-        plannedSession('telegram-job-offer', 80, 'user_button', 20),
-        plannedSession('boss-favor', 60, 'scenario_complete', 6, 6),
+        plannedSession('mobile-money-call', 60, 'user_button', 43),
+        plannedSession('telegram-job-offer', 40, 'user_button', 38, 6),
+        plannedSession('telegram-job-offer', 80, 'scenario_complete', 19),
+        plannedSession('boss-favor', 60, 'scenario_complete', 34, 6),
       ],
     },
-    { key: 'dawit', name: 'Dawit Bekele', email: `dawit@${DEMO_EMAIL_DOMAIN}`, role: 'employee', inOrg: true, sessions: [] },
+    {
+      key: 'dawit', name: 'Dawit Bekele', email: `dawit@${DEMO_EMAIL_DOMAIN}`, role: 'employee', inOrg: true,
+      sessions: [
+        plannedSession('mobile-money-call', 80, 'end_signal', 32),
+        plannedSession('telegram-job-offer', 60, 'user_button', 30, 6),
+        plannedSession('boss-favor', 40, 'max_turns', 24, 8),
+      ],
+    },
+    {
+      key: 'liya', name: 'Liya Alemu', email: `liya@${DEMO_EMAIL_DOMAIN}`, role: 'employee', inOrg: true,
+      sessions: [
+        plannedSession('mobile-money-call', 20, 'user_button', 21),
+        plannedSession('telegram-job-offer', 100, 'scenario_complete', 16),
+        plannedSession('boss-favor', 80, 'end_signal', 13),
+      ],
+    },
+    {
+      key: 'biniam', name: 'Biniam Tesfaye', email: `biniam@${DEMO_EMAIL_DOMAIN}`, role: 'employee', inOrg: true,
+      sessions: [
+        plannedSession('mobile-money-call', 100, 'scenario_complete', 11),
+        plannedSession('telegram-job-offer', 20, 'end_signal', 7, 6),
+        plannedSession('boss-favor', 40, 'max_turns', 5, 8),
+      ],
+    },
   ],
   individual: {
     key: 'meron', name: 'Meron Haile', email: `meron@${DEMO_EMAIL_DOMAIN}`, role: 'individual', inOrg: false,
@@ -274,6 +300,7 @@ export function buildDemoData(now, passwordHash) {
         score,
         band: report?.band ?? null,
         report,
+        checkpointSummary: report?.checkpoints.map(({ id, status }) => ({ id, status })) ?? [],
         createdAt,
         finishedAt: isActive ? null : new Date(createdAt.getTime() + 15 * 60 * 1000),
       })

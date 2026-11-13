@@ -4,6 +4,7 @@ import {
   bandForScore,
   computeScore,
   DEMO_PLAN,
+  SCENARIOS,
 } from '../scripts/seedData.js'
 
 const reportKeys = [
@@ -20,9 +21,11 @@ describe('demo seed data', () => {
     const data = fixture()
     const targetsByUser = new Map([
       ['admin', [20]],
-      ['hana', [100, 60, 20]],
-      ['selam', [80, 60]],
-      ['dawit', []],
+      ['hana', [40, 80, 20, 20]],
+      ['selam', [60, 40, 80, 60]],
+      ['dawit', [80, 60, 40]],
+      ['liya', [20, 100, 80]],
+      ['biniam', [100, 20, 40]],
       ['meron', [80, 40, 100]],
     ])
     for (const session of data.sessions.filter(item => item.status === 'finished')) {
@@ -32,10 +35,13 @@ describe('demo seed data', () => {
       expect(bandForScore(session.score)).toBe(session.band)
       expect(bandForScore(session.score)).toBe(session.report.band)
       expect(session.score).toBe(target)
+      expect(session.checkpointSummary).toEqual(
+        session.report.checkpoints.map(({ id, status }) => ({ id, status })),
+      )
     }
   })
 
-  it('has the planned session counts and an employee average score of 64', () => {
+  it('has the planned session counts and 17 varied employee sessions', () => {
     const data = fixture()
     const counts = Object.fromEntries(data.users.map(user => [user.key, {
       finished: data.sessions.filter(session => session.userKey === user.key && session.status === 'finished').length,
@@ -43,17 +49,35 @@ describe('demo seed data', () => {
     }]))
     expect(counts).toEqual({
       admin: { finished: 1, active: 0 },
-      hana: { finished: 3, active: 0 },
-      selam: { finished: 2, active: 0 },
-      dawit: { finished: 0, active: 0 },
+      hana: { finished: 4, active: 0 },
+      selam: { finished: 4, active: 0 },
+      dawit: { finished: 3, active: 0 },
+      liya: { finished: 3, active: 0 },
+      biniam: { finished: 3, active: 0 },
       meron: { finished: 3, active: 1 },
     })
 
     const employeeScores = data.sessions
-      .filter(session => ['hana', 'selam'].includes(session.userKey) && session.status === 'finished')
+      .filter(session => ['hana', 'selam', 'dawit', 'liya', 'biniam'].includes(session.userKey) && session.status === 'finished')
       .map(session => session.score)
-    expect(employeeScores.reduce((sum, score) => sum + score, 0) / employeeScores.length).toBe(64)
-    expect(employeeScores).toHaveLength(5)
+    expect(employeeScores.reduce((sum, score) => sum + score, 0)).toBe(940)
+    expect(employeeScores).toHaveLength(17)
+
+    const employeeSessions = data.sessions.filter(session => session.userKey !== 'admin' && session.userKey !== 'meron')
+    for (const scenarioId of Object.keys(SCENARIOS)) {
+      const sessions = employeeSessions.filter(session => session.scenarioId === scenarioId)
+      expect(sessions.length).toBeGreaterThanOrEqual(4)
+      expect(new Set(sessions.map(session => session.score)).size).toBeGreaterThan(1)
+      expect(sessions.every(session =>
+        session.createdAt >= new Date('2026-10-24T12:00:00.000Z').getTime() - 56 * 24 * 60 * 60 * 1000 &&
+        session.createdAt <= new Date('2026-10-24T12:00:00.000Z'),
+      )).toBe(true)
+    }
+
+    const hanaMobile = employeeSessions.filter(session => session.userKey === 'hana' && session.scenarioId === 'mobile-money-call')
+    const selamTelegram = employeeSessions.filter(session => session.userKey === 'selam' && session.scenarioId === 'telegram-job-offer')
+    expect(hanaMobile[1].score).toBeGreaterThan(hanaMobile[0].score)
+    expect(selamTelegram[1].score).toBeGreaterThan(selamTelegram[0].score)
   })
 
   it('includes all bands and keeps report shape and feedback bounded', () => {
@@ -75,7 +99,8 @@ describe('demo seed data', () => {
     expect(active.messages).toHaveLength(3)
     expect(new Set(data.users.map(user => user.email)).size).toBe(data.users.length)
     expect(data.users.every(user => user.email.endsWith('@demo.example.com'))).toBe(true)
-    expect(DEMO_PLAN.employees.find(user => user.key === 'dawit').sessions).toHaveLength(0)
+    expect(DEMO_PLAN.employees).toHaveLength(5)
+    expect(DEMO_PLAN.employees.find(user => user.key === 'dawit').name).toBe('Dawit Bekele')
   })
 
   it('alternates messages, keeps stage indexes ordered, and uses only safe demo digit strings', () => {

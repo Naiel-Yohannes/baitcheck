@@ -99,10 +99,10 @@ From `server`, `npm run ai:models` lists available model IDs, `npm run ai:ping` 
 The seed creates these fictional demo accounts at `demo.example.com`:
 
 - `admin@demo.example.com` — organization admin
-- `hana@demo.example.com`, `selam@demo.example.com`, `dawit@demo.example.com` — employees
+- `hana@demo.example.com`, `selam@demo.example.com`, `dawit@demo.example.com`, `liya@demo.example.com`, `biniam@demo.example.com` — employees
 - `meron@demo.example.com` — individual
 
-Seed demo password: `DemoPass123`. Organization join code: `BEAT42`. These credentials and users are fictional demo data; do not use them for real accounts or production.
+The seed creates seven users, one organization, and twenty-two sessions: seventeen finished employee sessions, one finished admin session, and Meron's three finished sessions plus one active session. Seed demo password: `DemoPass123`. Organization join code: `BEAT42`. These credentials and users are fictional demo data; do not use them for real accounts or production.
 
 ## Roadmap
 
@@ -115,4 +115,3 @@ Ideas listed for future work: prize-message, fake IT helpdesk and online-friend 
 - Nahom Laikemariam    CTC-7614-26
 - Nebiyu Amare    CTC-1104-26
 - Yonatan Getachew   CTC-4561-26
-
