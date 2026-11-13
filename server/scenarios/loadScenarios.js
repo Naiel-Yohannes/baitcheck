@@ -3,7 +3,7 @@ import { join } from 'node:path'
 import { createScenarioStore } from './scenarioStore.js'
 import { validateScenarioSet } from './validateScenario.js'
 
-export const EXPECTED_SCENARIO_COUNT = 4
+export const EXPECTED_SCENARIO_COUNT = 5
 
 export async function loadScenarios(dir, { expectedCount = null } = {}) {
   const filenames = (await readdir(dir)).filter(filename => filename.endsWith('.json')).sort()
