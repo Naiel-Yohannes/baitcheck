@@ -224,7 +224,7 @@ export default function Admin() {
           {employees.length === 0 ? (
             <p className="rounded-2xl border border-slate-700 bg-slate-900/70 px-5 py-8 text-center text-slate-300">{t('adminNoEmployees')}</p>
           ) : (
-            <div className="space-y-3 md:hidden">
+            <div className="space-y-3">
               {employees.map(employee => (
                 <article key={employee.id} className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/80">
                   <button type="button" onClick={() => toggleEmployee(employee.id)} aria-expanded={Boolean(expandedEmployees[employee.id])} className="grid min-h-11 w-full grid-cols-2 gap-x-3 gap-y-3 p-4 text-left hover:bg-slate-800/80">
