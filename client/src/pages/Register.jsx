@@ -3,6 +3,8 @@ import { Link, Navigate, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
 import { errorText } from '../errorText'
+import PasswordField from '../components/PasswordField'
+import { evaluatePassword } from '../lib/passwordStrength'
 
 const TYPES = ['individual', 'create', 'join']
 
@@ -310,13 +312,12 @@ export default function Register() {
               placeholder="you@example.com"
             />
 
-            <InputField
+            <PasswordField
               id="reg-password"
-              label={t('fieldPassword')}
-              type="password"
-              autoComplete="new-password"
               value={password}
               onChange={e => { setField('password', e.target.value); setErrors(v => ({ ...v, password: '' })) }}
+              email={email}
+              name={name}
               disabled={pending}
               error={errors.password}
             />

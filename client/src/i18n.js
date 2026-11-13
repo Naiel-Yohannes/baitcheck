@@ -79,7 +79,13 @@ export const strings = {
     fieldPassword:          'Password',
     fieldName:              'Full name',
     actionSubmit:           'Submit',
-    statusPleaseWait:       'Please wait…',
+    passwordRuleLength: 'Password must be at least 8 characters',
+    passwordRuleLowercase: 'Include a lowercase letter',
+    passwordRuleUppercase: 'Include an uppercase letter',
+    passwordRuleDigit: 'Include a digit',
+    passwordRuleSymbol: 'Include a special symbol',
+    passwordProblemCommon: 'Password is too common.',
+    passwordProblemContainsEmail: 'Password contains part of your email.',
 
     validEmailRequired:     'Please enter a valid email address.',
     validPasswordRequired:  'Password must be at least 8 characters.',
@@ -263,7 +269,15 @@ export const strings = {
     error_NETWORK_ERROR:      'ከአገልጋዩ ጋር ግንኙነት ማድረግ አልተቻለም። የኢንተርኔት ግንኙነትዎን ያረጋግጡ።',
     errorGeneric:             'ችግር ተፈጥሯል። እንደገና ይሞክሩ።',
 
-    fieldEmail:             'ኢሜይል አድራሻ',
+    passwordRuleLength: 'የይለፍ ቃል ቢያንስ 8 ቁምፊዎች መሆን አለበት', // needs native review
+    passwordRuleLowercase: 'የታችኛውን ፊደል ይዘው ይውሰዱ', // needs native review
+    passwordRuleUppercase: 'የከፍተኛውን ፊደል ይዘው ይውሰዱ', // needs native review
+    passwordRuleDigit: 'ቁጥር ይጨምሩ', // needs native review
+    passwordRuleSymbol: 'ልዩ ምልክት ይጨምሩ', // needs native review
+    passwordProblemCommon: 'የይለፍ ቃል በጣም ተለምዶ ነው።', // needs native review
+    passwordProblemContainsEmail: 'የይለፍ ቃል የኢሜይልን ክፍል ይዟል።', // needs native review
+
+    validEmailRequired:     'እባክዎ ትክክለኛ ኢሜይል አድራሻ ያስገቡ።',
     fieldPassword:          'የይለፍ ቃል',
     fieldName:              'ሙሉ ስም',
     actionSubmit:           'አስገባ',

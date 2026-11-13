@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 const baseUrl = (process.argv[2] || process.env.SMOKE_URL || 'http://localhost:5000').replace(/\/$/, '');
-const password = 'SmokePass123';
+const password = 'Smoke#Pass123';
 const email = `smoke-${Date.now()}@demo.example.com`;
 const checks = [];
 let requestCount = 0;

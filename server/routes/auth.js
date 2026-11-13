@@ -10,13 +10,14 @@ import { signToken } from '../utils/token.js'
 import { createRequireAuth } from '../middleware/auth.js'
 import { AppError, emailTaken, invalidCredentials } from '../utils/errors.js'
 import asyncHandler from '../utils/asyncHandler.js'
+import { checkPassword } from '../utils/passwordPolicy.js'
 
 const optionalTrimmed = z.string().trim().transform(value => value || undefined).optional()
 
 export const registerSchema = z.object({
   name: z.string().trim().min(2).max(60),
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8).max(72).refine(value => Buffer.byteLength(value, 'utf8') <= 72, {
+  password: z.string().max(72).refine(value => Buffer.byteLength(value, 'utf8') <= 72, {
     message: 'Password must be at most 72 bytes.',
   }),
   joinCode: optionalTrimmed,
@@ -27,6 +28,13 @@ export const registerSchema = z.object({
       code: z.ZodIssueCode.custom,
       path: ['joinCode'],
       message: 'Provide either a join code or an organization name, not both.',
+    })
+  }
+  for (const issue of checkPassword(body.password, { email: body.email, name: body.name })) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['password'],
+      message: issue,
     })
   }
 })
