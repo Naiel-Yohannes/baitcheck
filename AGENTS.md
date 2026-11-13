@@ -46,7 +46,7 @@ POST /auth/register {name,email,password,joinCode?,orgName?} -> 201 {token,user,
 POST /auth/login -> {token,user}   GET /auth/me -> {user}   GET /health -> {ok:true}
 GET /scenarios -> {scenarios:[{id,title:{en,am},description:{en,am},languages,channel,estimatedMinutes}]}
 POST /sessions {scenarioId,language} -> 201 {sessionId,scenarioId,scenarioTitle,language,channel,persona:{userRole,fakeData:[{key,label,value}]},firstMessage,maxTurns,turnCount}
-GET /sessions/:id -> {session:{id,scenarioId,scenarioTitle,language,channel,status,turnCount,maxTurns,stageIndex,endReason,persona,messages:[{role,text}],report}}
+GET /sessions/:id -> {session:{id,scenarioId,scenarioTitle,language,channel,status,turnCount,maxTurns,stageIndex,endReason,persona,messages:[{role,text,stageIndex}],report}}
 POST /sessions/:id/message {text<=500} -> {reply,stageIndex,turnCount,ended,warning}
 POST /sessions/:id/finish -> {report}   GET /sessions/mine -> {sessions:[{id,scenarioId,scenarioTitle,language,status,score,band,createdAt,finishedAt}]}
 GET /org/summary (orgAdmin) -> {org:{name,joinCode},averageScore,completedSessions,employeeCount,employees:[{id,name,sessionsCompleted,averageScore,lastActivity,sessions:[...]}]}

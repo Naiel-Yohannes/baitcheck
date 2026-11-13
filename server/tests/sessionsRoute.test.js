@@ -219,7 +219,7 @@ describe('POST /api/sessions', () => {
 })
 
 describe('GET /api/sessions/:id and /mine', () => {
-  it('returns the owner the full session shape with only role and text in messages', async () => {
+  it('returns the owner the full session shape with role, text, and stageIndex in messages', async () => {
     const { app } = buildApp()
     const started = await startSession(app)
     const res = await asUser(request(app).get(`/api/sessions/${started.body.sessionId}`))
@@ -237,8 +237,8 @@ describe('GET /api/sessions/:id and /mine', () => {
       persona: started.body.persona,
       report: null,
     })
-    expect(res.body.session.messages).toEqual([{ role: 'attacker', text: openingEn }])
-    expect(Object.keys(res.body.session.messages[0]).sort()).toEqual(['role', 'text'])
+    expect(res.body.session.messages).toEqual([{ role: 'attacker', text: openingEn, stageIndex: 0 }])
+    expect(Object.keys(res.body.session.messages[0]).sort()).toEqual(['role', 'stageIndex', 'text'])
   })
 
   it('returns the same 404 for another user and for an unknown id', async () => {

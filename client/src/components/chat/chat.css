@@ -1,0 +1,58 @@
+.chat-message-enter {
+  animation: chat-message-slide-in 220ms ease-out both;
+}
+
+.chat-call-ring > span {
+  animation: chat-call-pulse 1.5s ease-out infinite;
+}
+
+.chat-typing-dot {
+  animation: chat-typing-bounce 1s ease-in-out infinite;
+}
+
+.chat-typing-dot-delayed {
+  animation-delay: 150ms;
+}
+
+.chat-typing-dot-later {
+  animation-delay: 300ms;
+}
+
+@keyframes chat-message-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes chat-call-pulse {
+  from {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(2.7);
+  }
+}
+
+@keyframes chat-typing-bounce {
+  0%, 60%, 100% {
+    transform: translateY(0);
+  }
+  30% {
+    transform: translateY(-4px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chat-message-enter,
+  .chat-call-ring > span,
+  .chat-typing-dot {
+    animation: none;
+  }
+}

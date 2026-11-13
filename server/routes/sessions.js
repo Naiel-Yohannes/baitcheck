@@ -43,6 +43,10 @@ function publicMessages(messages) {
   return (Array.isArray(messages) ? messages : []).map(({ role, text }) => ({ role, text }))
 }
 
+function publicSessionMessages(messages) {
+  return (Array.isArray(messages) ? messages : []).map(({ role, text, stageIndex }) => ({ role, text, stageIndex }))
+}
+
 export function createSessionsRouter({ requireAuth, rateLimits, store, ai, repo }) {
   const router = Router()
 
@@ -137,7 +141,7 @@ export function createSessionsRouter({ requireAuth, rateLimits, store, ai, repo 
         stageIndex: session.stageIndex,
         endReason: session.endReason,
         persona,
-        messages: publicMessages(session.messages),
+        messages: publicSessionMessages(session.messages),
         report,
       },
     })

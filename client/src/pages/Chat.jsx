@@ -3,6 +3,10 @@ import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { ApiError, finishSession, getSession, sendMessage } from '../api'
 import { useLang } from '../context/LanguageContext'
 import { errorText } from '../errorText'
+import ChatHeader from '../components/chat/ChatHeader'
+import MessageBubble from '../components/chat/MessageBubble'
+import TypingDots from '../components/chat/TypingDots'
+import '../components/chat/chat.css'
 
 function channelTranslation(channel) {
   return {
@@ -223,10 +227,7 @@ export default function Chat() {
     <section className="-mx-2 flex h-[calc(100dvh-11rem)] min-h-[31rem] flex-col overflow-hidden rounded-xl border border-slate-800 bg-slate-950 sm:-mx-0" aria-label={t('headingChat')}>
       <header className="shrink-0 border-b border-slate-800 px-4 py-3 sm:px-5">
         <div className="flex min-w-0 items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h1 className="break-words text-lg font-semibold leading-6 text-white">{session.scenarioTitle}</h1>
-            <span className="mt-1 inline-flex rounded-full bg-sky-500/15 px-2.5 py-1 text-xs font-medium text-sky-200">{t(channelTranslation(session.channel))}</span>
-          </div>
+          <ChatHeader session={session} t={t} channelLabel={t(channelTranslation(session.channel))} />
           <p className="shrink-0 whitespace-nowrap rounded-lg bg-slate-800 px-3 py-2 text-sm font-semibold text-slate-200" aria-label={t('chatTurnCounter').replace('{current}', turnCount).replace('{maximum}', session.maxTurns)}>
             {turnCount} / {session.maxTurns}
           </p>
@@ -288,19 +289,10 @@ export default function Chat() {
       </div>
 
       <div ref={messageAreaRef} lang={session.language} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain px-3 py-4 sm:px-5">
-        {messages.map((message) => {
-          const isUser = message.role === 'user'
-          return (
-            <div key={message.localId} className={`flex ${isUser ? 'justify-end' : 'justify-start'}`}>
-              <p className={`max-w-[88%] whitespace-pre-wrap break-words rounded-2xl px-3.5 py-2.5 text-sm leading-6 sm:max-w-[78%] ${
-                isUser ? 'rounded-br-md bg-violet-700 text-white' : 'rounded-bl-md bg-slate-800 text-slate-100'
-              } ${message.pending ? 'opacity-60' : ''}`}>
-                {message.text}
-              </p>
-            </div>
-          )
-        })}
-        {pending && <p className="text-xs italic text-slate-400" role="status">{t('chatTyping')}</p>}
+        {messages.map((message) => (
+          <MessageBubble key={message.localId} message={message} isUser={message.role === 'user'} channel={session.channel} t={t} language={session.language} />
+        ))}
+        {pending && <TypingDots label={t('chatTyping')} initial={t('chatAttackerInitial')} />}
       </div>
 
       <form onSubmit={handleSend} className="shrink-0 border-t border-slate-800 bg-slate-950 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-2 sm:px-4">

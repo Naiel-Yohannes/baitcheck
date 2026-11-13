@@ -171,8 +171,9 @@ if (!ok) {
       expectStatus(result, 200);
       const session = result.data.session;
       expect(Array.isArray(session?.messages) && session.messages.length === 3 &&
-        session.messages.every((message) => Object.keys(message).length === 2 &&
-          Object.keys(message).every((key) => ['role', 'text'].includes(key))), 'session.messages length and keys');
+        session.messages.every((message) => Object.keys(message).length === 3 &&
+          Object.keys(message).every((key) => ['role', 'text', 'stageIndex'].includes(key)) &&
+          Number.isInteger(message.stageIndex)), 'session.messages length, keys, and stageIndex');
       expect(session?.turnCount === 1, 'session.turnCount');
       expect(session?.report === null, 'session.report');
     });
