@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 import { fileURLToPath } from 'node:url'
-import { loadScenarios } from '../scenarios/loadScenarios.js'
+import { EXPECTED_SCENARIO_COUNT, loadScenarios } from '../scenarios/loadScenarios.js'
 import { checkUserInput, sanitizeOutput } from '../engine/safety.js'
 import { evaluateCodeCheckpoints } from '../engine/scoring.js'
 
 const scenariosDir = fileURLToPath(new URL('../scenarios/', import.meta.url))
-const scenariosPromise = loadScenarios(scenariosDir, { expectedCount: 3 })
+const scenariosPromise = loadScenarios(scenariosDir, { expectedCount: EXPECTED_SCENARIO_COUNT })
 const getScenarios = async () => (await scenariosPromise).getAll()
 const languages = ['en', 'am']
 
@@ -14,8 +14,8 @@ function localized(value, language) {
 }
 
 describe('scenario content', () => {
-  it('loads all three scenarios without validation problems', async () => {
-    await expect(getScenarios()).resolves.toHaveLength(3)
+  it('loads all scenarios without validation problems', async () => {
+    await expect(getScenarios()).resolves.toHaveLength(EXPECTED_SCENARIO_COUNT)
   })
 
   it.each(languages)('keeps fake data safe and canned text sanitized for %s', async language => {

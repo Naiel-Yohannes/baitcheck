@@ -6,7 +6,7 @@ import { createApp } from './app.js'
 import User from './models/User.js'
 import Org from './models/Org.js'
 import Session from './models/Session.js'
-import { loadScenarios } from './scenarios/loadScenarios.js'
+import { EXPECTED_SCENARIO_COUNT, loadScenarios } from './scenarios/loadScenarios.js'
 import { createFakeAi } from './engine/fakeAi.js'
 import { createLlm } from './ai/llm.js'
 import { createGeminiAi } from './ai/geminiAi.js'
@@ -28,10 +28,10 @@ let store
 try {
   const scenariosDir = fileURLToPath(new URL('./scenarios/', import.meta.url))
   store = await loadScenarios(scenariosDir, {
-    expectedCount: config.NODE_ENV === 'production' ? 3 : null,
+    expectedCount: config.NODE_ENV === 'production' ? EXPECTED_SCENARIO_COUNT : null,
   })
-  if (config.NODE_ENV !== 'production' && store.getAll().length < 3) {
-    console.warn(`Only ${store.getAll().length} of 3 scenarios found (allowed outside production)`)
+  if (config.NODE_ENV !== 'production' && store.getAll().length < EXPECTED_SCENARIO_COUNT) {
+    console.warn(`Only ${store.getAll().length} of ${EXPECTED_SCENARIO_COUNT} scenarios found (allowed outside production)`)
   }
 } catch (err) {
   console.error(err.message)

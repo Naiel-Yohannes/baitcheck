@@ -3,7 +3,7 @@ import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { loadScenarios } from '../scenarios/loadScenarios.js'
+import { EXPECTED_SCENARIO_COUNT, loadScenarios } from '../scenarios/loadScenarios.js'
 
 const sourceFile = fileURLToPath(new URL('../scenarios/mobile-money-call.json', import.meta.url))
 const temporaryDirectories = []
@@ -49,13 +49,13 @@ describe('loadScenarios', () => {
     await writeFile(join(directory, 'first.json'), text)
     await writeFile(join(directory, 'second.json'), text)
     try {
-      await loadScenarios(directory, { expectedCount: 3 })
+      await loadScenarios(directory, { expectedCount: EXPECTED_SCENARIO_COUNT })
       throw new Error('expected loadScenarios to fail')
     } catch (error) {
       expect(error.message).toContain('first.json: file name must match scenario id')
       expect(error.message).toContain('second.json: file name must match scenario id')
       expect(error.message).toContain('duplicate scenario id')
-      expect(error.message).toContain('expected 3 scenarios, found 2')
+      expect(error.message).toContain(`expected ${EXPECTED_SCENARIO_COUNT} scenarios, found 2`)
       expect(error.message.split('\n')).toHaveLength(4)
     }
   })
@@ -63,7 +63,8 @@ describe('loadScenarios', () => {
   it('checks expectedCount when supplied and accepts a smaller set when null', async () => {
     const directory = await newDirectory()
     await writeFile(join(directory, 'mobile-money-call.json'), await scenarioText())
-    await expect(loadScenarios(directory, { expectedCount: 3 })).rejects.toThrow('expected 3 scenarios, found 1')
+    await expect(loadScenarios(directory, { expectedCount: EXPECTED_SCENARIO_COUNT }))
+      .rejects.toThrow(`expected ${EXPECTED_SCENARIO_COUNT} scenarios, found 1`)
     await expect(loadScenarios(directory, { expectedCount: null })).resolves.toMatchObject({
       getAll: expect.any(Function),
     })

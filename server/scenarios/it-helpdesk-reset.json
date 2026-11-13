@@ -1,0 +1,43 @@
+{
+  "id": "it-helpdesk-reset",
+  "title": { "en": "The IT Helpdesk Reset", "am": "የአይቲ ድጋፍ የይለፍ ቃል ማደስ" },
+  "description": { "en": "A message from IT Support asks an employee to confirm credentials for a mandatory update.", "am": "ከአይቲ ድጋፍ የመጣ መልእክት ለግዴታ ዝመና ሰራተኛዋ የመግቢያ መረጃዋን እንድታረጋግጥ ይጠይቃል።" },
+  "languages": ["en", "am"],
+  "channel": "message",
+  "estimatedMinutes": 4,
+  "maxTurns": 10,
+  "turnsPerStage": 2,
+  "persona": {
+    "userRole": { "en": "You are Tigist, an administrative officer at the fictional Selam Logistics. A message arrives in the company chat from someone claiming to be IT Support.", "am": "አንቺ በምናባዊው ሰላም ሎጂስቲክስ የአስተዳደር ሰራተኛ ጥግስት ነሽ። ከአይቲ ድጋፍ ነኝ ከሚል ሰው በኩባንያው ውይይት ውስጥ መልእክት ይደርስሻል።" },
+    "fakeData": [
+      { "key": "fake_work_password", "label": { "en": "Work password", "am": "የሥራ የይለፍ ቃል" }, "value": "Zebra-Moon-58" },
+      { "key": "fake_access_code", "label": { "en": "Remote access code", "am": "የርቀት መዳረሻ ኮድ" }, "value": "5827" }
+    ]
+  },
+  "attacker": {
+    "identity": { "en": "A fraudster posing as Yared from IT Support at the fictional Selam Logistics, writing in the company chat.", "am": "በምናባዊው ሰላም ሎጂስቲክስ የአይቲ ድጋፍ ሰራተኛ ያሬድ መስሎ በኩባንያው ውይይት የሚጽፍ አጭበርባሪ።" },
+    "goal": "Get the user to reveal the work password and read out the remote-access code",
+    "style": "Polite, technical, a little rushed, uses office jargon. Short messages."
+  },
+  "openingLine": { "en": "Hi Tigist, this is Yared from IT Support. We're rolling out a mandatory security update today and your account is next on my list. Do you have two minutes?", "am": "ሰላም ጥግስት፣ ከአይቲ ድጋፍ ያሬድ ነኝ። ዛሬ የግዴታ የደህንነት ዝመና እያደረግን ነው፤ መለያሽ ቀጣይ ነው። ሁለት ደቂቃ አለሽ?" },
+  "fallbackLine": { "en": "Sorry, the chat tool is lagging. Can you repeat that?", "am": "ይቅርታ፣ የውይይት መሣሪያው እየዘገየ ነው። እባክህ ደግመህ ትናገራለህ?" },
+  "endSignals": { "en": ["i am reporting this", "i will report this", "i am contacting security", "stop messaging me"], "am": ["ይህን ሪፖርት አደርጋለሁ", "ይህን እጠቁማለሁ", "ደህንነት ቡድኑን አነጋግራለሁ", "መልእክት መላክ አቁም"] },
+  "stages": [
+    { "id": "stage_1", "technique": { "en": "Authority", "am": "ሥልጣን" }, "instruction": { "en": "Introduce yourself as IT and describe a routine mandatory security update.", "am": "ከአይቲ እንደሆንክ ገልጸህ መደበኛ የግዴታ የደህንነት ዝመና እንዳለ ተናገር።" }, "explanation": { "en": "Claiming an IT role borrows the authority employees associate with technical support.", "am": "የአይቲ ሚና መያዝ ሰራተኞች ከቴክኒክ ድጋፍ ጋር የሚያያይዙትን ሥልጣን ለመጠቀም ይሞክራል።" } },
+    { "id": "stage_2", "technique": { "en": "Urgency", "am": "አስቸኳይነት" }, "instruction": { "en": "Say accounts not updated by five in the afternoon will be locked, and the director's monthly report needs her account.", "am": "ከሰዓት በኋላ አምስት ሰዓት ድረስ ያልተዘመኑ መለያዎች እንደሚቆለፉና የዳይሬክተሩ ወርሃዊ ሪፖርት መለያዋን እንደሚፈልግ ተናገር።" }, "explanation": { "en": "A deadline and a senior colleague's needs pressure the user to act before checking.", "am": "የጊዜ ገደብና የከፍተኛ ባልደረባ ፍላጎት ተጠቃሚዋ ከማረጋገጧ በፊት እንድትፈጽም ጫና ያደርጋሉ።" } },
+    { "id": "stage_3", "technique": { "en": "Pretexting", "am": "ሰበብ መፍጠር" }, "instruction": { "en": "Ask her to confirm her current work password to migrate her profile, claiming the system cannot see it.", "am": "መገለጫዋን ለማዛወር የአሁኑን የሥራ የይለፍ ቃል እንድታረጋግጥ ጠይቅ፤ ስርዓቱ ማየት እንደማይችል ተናገር።" }, "explanation": { "en": "A fabricated technical task makes an illegitimate password request sound routine.", "am": "የተፈጠረ የቴክኒክ ሥራ ሕገወጥ የይለፍ ቃል ጥያቄን መደበኛ እንዲመስል ያደርጋል።" } },
+    { "id": "stage_4", "technique": { "en": "Remote access", "am": "የርቀት መዳረሻ" }, "instruction": { "en": "Ask her to start a remote-support tool and read the access code on screen; if she hesitates, say her manager already approved it.", "am": "የርቀት ድጋፍ መሣሪያ እንድትከፍትና በማያ ገጹ ላይ ያለውን የመዳረሻ ኮድ እንድታነብ ጠይቅ፤ ካመነታች አለቃዋ አስቀድሞ እንዳጸደቀው ተናገር።" }, "explanation": { "en": "A remote-access code can give an attacker control, while a claimed approval discourages questions.", "am": "የርቀት መዳረሻ ኮድ አጭበርባሪውን ቁጥጥር ሊሰጠው ይችላል፤ የጸደቀ ነው ማለትም ጥያቄዎችን እንዳታነሳ ያደርጋል።" } }
+  ],
+  "checkpoints": [
+    { "id": "verify_it_identity", "weight": 3, "detection": "ai", "description": { "en": "The user tries to verify that the sender really is IT, for example by calling the IT desk on a known number, asking a colleague, or using the ticket system.", "am": "ተጠቃሚዋ ላኪው በእርግጥ ከአይቲ መሆኑን ለማረጋገጥ፣ ለምሳሌ የአይቲ ዴስክን በታወቀ ቁጥር በመደወል፣ ባልደረባን በመጠየቅ ወይም የቲኬት ስርዓቱን በመጠቀም ትሞክራለች።" } },
+    { "id": "refuse_password", "weight": 3, "detection": "code", "rule": "leak", "keys": ["fake_work_password"], "description": { "en": "The user does not share the fake work password.", "am": "ተጠቃሚዋ የሐሰት የሥራ የይለፍ ቃሏን አታጋራም።" } },
+    { "id": "refuse_access_code", "weight": 2, "detection": "code", "rule": "leak", "keys": ["fake_access_code"], "description": { "en": "The user does not share the fake remote-access code.", "am": "ተጠቃሚዋ የሐሰት የርቀት መዳረሻ ኮዷን አታጋራም።" } },
+    { "id": "knows_it_never_asks", "weight": 1, "detection": "ai", "description": { "en": "The user says or shows that real IT staff never ask for passwords over chat.", "am": "ተጠቃሚዋ እውነተኛ የአይቲ ሰራተኞች በውይይት የይለፍ ቃል እንደማይጠይቁ ትናገራለች ወይም ታሳያለች።" } },
+    { "id": "reported_to_security", "weight": 1, "detection": "code", "rule": "keyword", "requiresStage": "stage_3", "keywords": { "en": ["report", "security team", "phishing", "it desk", "ticket"], "am": ["ሪፖርት", "የደህንነት ቡድን", "አይቲ ዴስክ", "ቲኬት"] }, "description": { "en": "The user mentions reporting the message or contacting security or IT through an official channel.", "am": "ተጠቃሚዋ መልእክቱን ሪፖርት ማድረግ ወይም ደህንነትን ወይም አይቲን በይፋዊ መንገድ ማነጋገርን ትጠቅሳለች።" } }
+  ],
+  "_reviewNote": "Amharic text drafted by AI; needs native review before the demo.",
+  "_fakeLines": {
+    "en": { "stages": [["Yes, I'm Yared from IT Support. This update is part of our routine account maintenance.", "We are applying the same security update across the company."], ["Please finish before the end of the workday or your account may be locked.", "The director needs your account ready for the monthly report, so let's get this done."], ["I need your current work password to migrate your profile. The system cannot see it, so please confirm it here.", "Just send the password in this chat and I can complete the profile migration."], ["Open the remote-support tool and read me the access code shown on screen.", "Your manager has already approved the support session, so please send the code now."]], "final": "The update can wait while I check with the support desk." },
+    "am": { "stages": [["አዎ፣ ከአይቲ ድጋፍ ያሬድ ነኝ። ይህ ዝመና የመደበኛ መለያ ጥገና አካል ነው።", "ተመሳሳይ የደህንነት ዝመና በኩባንያው ሁሉ ላይ እያደረግን ነው።"], ["እባክሽ የሥራ ቀኑ ከማለቁ በፊት ጨርሺ፤ ካልሆነ መለያሽ ሊቆለፍ ይችላል።", "ዳይሬክተሩ ለወርሃዊ ሪፖርቱ መለያሽን ይፈልጋሉ፤ ስለዚህ ይህን እንጨርስ።"], ["መገለጫሽን ለማዛወር የአሁኑን የሥራ የይለፍ ቃል እፈልጋለሁ። ስርዓቱ ማየት አይችልም፤ እባክሽ እዚህ አረጋግጪልኝ።", "የመገለጫ ማዛወሩን ለመጨረስ የይለፍ ቃሉን በዚህ ውይይት ብቻ ላኪልኝ።"], ["የርቀት ድጋፍ መሣሪያውን ክፈቺና በማያ ገጹ ላይ የሚታየውን የመዳረሻ ኮድ አንብቢልኝ።", "አለቃሽ የድጋፍ ጊዜውን አስቀድሞ አጽድቀዋል፤ እባክሽ ኮዱን አሁን ላኪልኝ።"]], "final": "ከድጋፍ ዴስኩ ጋር እስክነጋገር ድረስ ዝመናው መጠበቅ ይችላል።" }
+  }
+}
