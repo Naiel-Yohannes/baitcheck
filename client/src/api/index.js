@@ -45,3 +45,13 @@ export function getMySessions() {
 export function getOrgSummary() {
   return request('GET', '/api/org/summary')
 }
+
+// Rotate organization join code
+export function rotateJoinCode() {
+  return request('POST', '/api/org/rotate-code')
+}
+
+// Delete an employee from the organization
+export function removeEmployee(id) {
+  return request('DELETE', `/api/org/employees/${encodeURIComponent(id)}`)
+}

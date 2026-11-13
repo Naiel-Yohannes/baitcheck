@@ -1,7 +1,10 @@
-import { Fragment, useCallback, useEffect, useRef, useState } from 'react'
-import { ApiError, getOrgSummary } from '../api'
+import React, { Fragment, useCallback, useEffect, useRef, useState } from 'react'
+import { ApiError, getOrgSummary, rotateJoinCode, removeEmployee } from '../api'
 import { useLang } from '../context/LanguageContext'
 import { errorText } from '../errorText'
+import DonutChart from '../components/charts/DonutChart'
+import BarList from '../components/charts/BarList'
+import LineChart from '../components/charts/LineChart'
 
 function formatDate(value, locale) {
   if (value == null) return '-'
@@ -56,6 +59,9 @@ export default function Admin() {
   const [retryKey, setRetryKey] = useState(0)
   const [expandedEmployees, setExpandedEmployees] = useState({})
   const [copied, setCopied] = useState(false)
+  const [activeTab, setActiveTab] = useState('overview')
+  const [removingId, setRemovingId] = useState(null)
+  const [rotatePending, setRotatePending] = useState(false)
   const copiedTimerRef = useRef(null)
 
   const loadSummary = useCallback(async (isCancelled = () => false) => {
@@ -79,9 +85,7 @@ export default function Admin() {
     return () => { cancelled = true }
   }, [loadSummary, retryKey])
 
-  useEffect(() => () => {
-    if (copiedTimerRef.current) window.clearTimeout(copiedTimerRef.current)
-  }, [])
+  useEffect(() => () => { if (copiedTimerRef.current) window.clearTimeout(copiedTimerRef.current) }, [])
 
   const copyJoinCode = async () => {
     try {
@@ -98,6 +102,45 @@ export default function Admin() {
     setExpandedEmployees((current) => ({ ...current, [employeeId]: !current[employeeId] }))
   }
 
+  const handleRemove = async (id) => {
+    setRemovingId(id)
+    try {
+      await removeEmployee(id)
+      setRetryKey(k => k + 1)
+    } finally {
+      setRemovingId(null)
+    }
+  }
+
+  const handleRotate = async () => {
+    setRotatePending(true)
+    try {
+      const res = await rotateJoinCode()
+      setSummary(prev => ({ ...prev, org: { ...prev.org, joinCode: res.joinCode } }))
+    } finally {
+      setRotatePending(false)
+    }
+  }
+
+  const exportCSV = () => {
+    if (!summary) return
+    const rows = summary.employees.map(e => [
+      e.name,
+      e.sessionsCompleted,
+      e.averageScore ?? '',
+      formatDate(e.lastActivity, lang)
+    ])
+    const header = [t('adminEmployeeName'), t('adminSessionsCompleted'), t('adminAverageScore'), t('adminLastActivity')]
+    const csv = ['\uFEFF' + header.join(','), ...rows.map(r => r.map(v => `"${v}"`).join(','))].join('\n')
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'org_export.csv'
+    a.click()
+    URL.revokeObjectURL(url)
+  }
+
   if (loading) {
     return <p className="py-12 text-center text-slate-300" role="status">{t('adminLoading')}</p>
   }
@@ -107,7 +150,7 @@ export default function Admin() {
     return (
       <div className="mx-auto flex min-h-[55vh] max-w-lg flex-col items-center justify-center gap-4 px-2 text-center">
         <p className="text-rose-200" role="alert">{forbidden ? t('adminNoPermission') : errorText(loadError, t)}</p>
-        <button type="button" onClick={() => setRetryKey((key) => key + 1)} className="min-h-11 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{t('actionRetry')}</button>
+        <button type="button" onClick={() => setRetryKey(k => k + 1)} className="min-h-11 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{t('actionRetry')}</button>
       </div>
     )
   }
@@ -116,18 +159,23 @@ export default function Admin() {
     return (
       <div className="mx-auto flex min-h-[55vh] max-w-lg flex-col items-center justify-center gap-4 text-center">
         <p className="text-slate-300">{t('adminEmpty')}</p>
-        <button type="button" onClick={() => setRetryKey((key) => key + 1)} className="min-h-11 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{t('actionRetry')}</button>
+        <button type="button" onClick={() => setRetryKey(k => k + 1)} className="min-h-11 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{t('actionRetry')}</button>
       </div>
     )
   }
 
   const employees = Array.isArray(summary.employees) ? summary.employees : []
   const score = summary.averageScore == null ? t('adminNoData') : `${summary.averageScore} ${t('reportScoreOutOf')}`
+  const donutData = summary.scoreDistribution || { vulnerable:0, partial:0, resilient:0, strong:0 }
+  const barItems = (summary.byScenario || []).map(item => ({
+    label: item.scenarioTitle,
+    value: item.completed,
+    percent: summary.completedSessions ? (item.completed / summary.completedSessions) * 100 : 0,
+  }))
 
   return (
     <main className="mx-auto w-full max-w-6xl px-2 py-4 sm:px-0 sm:py-6">
       <h1 className="mb-6 text-3xl font-bold tracking-tight text-white">{t('headingAdmin')}</h1>
-
       <section className="mb-6 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/70 to-slate-900 p-5 shadow-lg sm:p-6">
         <h2 className="break-words font-mono text-2xl font-bold text-white">{summary.org?.name}</h2>
         <p className="mt-2 text-sm text-slate-300">{t('adminJoinCodeHelp')}</p>
@@ -135,68 +183,111 @@ export default function Admin() {
           <p className="min-w-0 flex-1 select-text break-all rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 font-mono text-2xl font-bold tracking-widest text-violet-200 sm:text-3xl">{summary.org?.joinCode}</p>
           <button type="button" onClick={copyJoinCode} className="min-h-11 shrink-0 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{copied ? t('adminCopied') : t('adminCopyCode')}</button>
         </div>
+        <div className="mt-4 flex gap-2">
+          <button type="button" onClick={handleRotate} disabled={rotatePending} className="min-h-11 rounded-xl bg-rose-600 px-5 py-2.5 font-semibold text-white hover:bg-rose-500">{t('adminGenerateNewCode')}</button>
+          <button type="button" onClick={exportCSV} className="min-h-11 rounded-xl bg-emerald-600 px-5 py-2.5 font-semibold text-white hover:bg-emerald-500">{t('adminExportCSV')}</button>
+        </div>
       </section>
 
-      <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label={t('adminOrganizationStats')}>
-        <StatCard label={t('adminAverageScore')} value={score} />
-        <StatCard label={t('adminCompletedSessions')} value={summary.completedSessions} />
-        <StatCard label={t('adminEmployeeCount')} value={summary.employeeCount} />
-      </section>
+      <nav className="mb-6 flex space-x-4" role="tablist">
+        <button role="tab" aria-selected={activeTab==='overview'} onClick={() => setActiveTab('overview')} className={`px-3 py-2 rounded ${activeTab==='overview' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabOverview')}</button>
+        <button role="tab" aria-selected={activeTab==='team'} onClick={() => setActiveTab('team')} className={`px-3 py-2 rounded ${activeTab==='team' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabTeam')}</button>
+        <button role="tab" aria-selected={activeTab==='insights'} onClick={() => setActiveTab('insights')} className={`px-3 py-2 rounded ${activeTab==='insights' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabInsights')}</button>
+        <button role="tab" aria-selected={activeTab==='settings'} onClick={() => setActiveTab('settings')} className={`px-3 py-2 rounded ${activeTab==='settings' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabSettings')}</button>
+      </nav>
 
-      <section>
-        <h2 className="mb-4 text-xl font-semibold text-white">{t('adminEmployees')}</h2>
-        {employees.length === 0 ? (
-          <p className="rounded-2xl border border-slate-700 bg-slate-900/70 px-5 py-8 text-center text-slate-300">{t('adminNoEmployees')}</p>
-        ) : (
-          <>
+      {activeTab === 'overview' && (
+        <>
+          <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3" aria-label={t('adminOrganizationStats')}>
+            <StatCard label={t('adminAverageScore')} value={score} />
+            <StatCard label={t('adminCompletedSessions')} value={summary.completedSessions} />
+            <StatCard label={t('adminEmployeeCount')} value={summary.employeeCount} />
+          </section>
+          <section className="mb-8">
+            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminScoreDistribution')}</h2>
+            <DonutChart data={donutData} />
+          </section>
+          <section className="mb-8">
+            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminByScenario')}</h2>
+            <BarList items={barItems} />
+          </section>
+          <section className="mb-8">
+            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminWeeklyTrend')}</h2>
+            <LineChart points={summary.trend || []} />
+          </section>
+        </>
+      )}
+
+      {activeTab === 'team' && (
+        <section>
+          <h2 className="mb-4 text-xl font-semibold text-white">{t('adminEmployees')}</h2>
+          {employees.length === 0 ? (
+            <p className="rounded-2xl border border-slate-700 bg-slate-900/70 px-5 py-8 text-center text-slate-300">{t('adminNoEmployees')}</p>
+          ) : (
             <div className="space-y-3 md:hidden">
-              {employees.map((employee) => (
+              {employees.map(employee => (
                 <article key={employee.id} className="overflow-hidden rounded-2xl border border-slate-700 bg-slate-900/80">
                   <button type="button" onClick={() => toggleEmployee(employee.id)} aria-expanded={Boolean(expandedEmployees[employee.id])} className="grid min-h-11 w-full grid-cols-2 gap-x-3 gap-y-3 p-4 text-left hover:bg-slate-800/80">
                     <span className="col-span-2 break-words text-base font-semibold text-white">{employee.name}</span>
-                    <span><span className="block text-xs text-slate-400">{t('adminSessionsCompleted')}</span><span className="mt-1 block text-sm text-slate-200">{employee.sessionsCompleted}</span></span>
-                    <span><span className="block text-xs text-slate-400">{t('adminAverageScore')}</span><span className="mt-1 block text-sm text-slate-200">{employee.averageScore == null ? '-' : `${employee.averageScore} ${t('reportScoreOutOf')}`}</span></span>
-                    <span className="col-span-2"><span className="block text-xs text-slate-400">{t('adminLastActivity')}</span><span className="mt-1 block text-sm text-slate-200">{formatDate(employee.lastActivity, lang)}</span></span>
+                    <span>
+                      <span className="block text-xs text-slate-400">{t('adminSessionsCompleted')}</span>
+                      <span className="mt-1 block text-sm text-slate-200">{employee.sessionsCompleted}</span>
+                    </span>
+                    <span>
+                      <span className="block text-xs text-slate-400">{t('adminAverageScore')}</span>
+                      <span className="mt-1 block text-sm text-slate-200">{employee.averageScore == null ? '-' : `${employee.averageScore} ${t('reportScoreOutOf')}`}</span>
+                    </span>
+                    <span className="col-span-2">
+                      <span className="block text-xs text-slate-400">{t('adminLastActivity')}</span>
+                      <span className="mt-1 block text-sm text-slate-200">{formatDate(employee.lastActivity, lang)}</span>
+                    </span>
                   </button>
-                  {expandedEmployees[employee.id] && <div className="border-t border-slate-800 px-4 py-2"><EmployeeSessions employee={employee} locale={lang} t={t} /></div>}
+                  {expandedEmployees[employee.id] && (
+                    <div className="border-t border-slate-800 px-4 py-2">
+                      <EmployeeSessions employee={employee} locale={lang} t={t} />
+                      <div className="mt-2 flex space-x-2">
+                        <button type="button" onClick={() => handleRemove(employee.id)} disabled={removingId===employee.id} className="rounded bg-red-600 px-3 py-1 text-xs text-white hover:bg-red-500">{t('adminRemoveEmployee')}</button>
+                        {removingId===employee.id && <span className="text-xs text-slate-400">{t('adminRemoving')}</span>}
+                      </div>
+                    </div>
+                  )}
                 </article>
               ))}
             </div>
+          )}
+        </section>
+      )}
 
-            <div className="hidden overflow-hidden rounded-2xl border border-slate-700 md:block">
-              <table className="w-full table-fixed text-left">
-                <thead className="bg-slate-900 text-xs uppercase tracking-wide text-slate-400">
-                  <tr>
-                    <th className="px-4 py-3">{t('adminEmployeeName')}</th>
-                    <th className="px-4 py-3">{t('adminSessionsCompleted')}</th>
-                    <th className="px-4 py-3">{t('adminAverageScore')}</th>
-                    <th className="px-4 py-3">{t('adminLastActivity')}</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-800 bg-slate-950/70">
-                  {employees.map((employee) => (
-                    <Fragment key={employee.id}>
-                      <tr>
-                        <td colSpan={4} className="p-0">
-                          <button type="button" onClick={() => toggleEmployee(employee.id)} aria-expanded={Boolean(expandedEmployees[employee.id])} className="grid min-h-11 w-full grid-cols-4 items-center text-left text-sm text-slate-200 hover:bg-slate-900">
-                            <span className="break-words px-4 py-3 font-medium text-white">{employee.name}</span>
-                            <span className="px-4 py-3">{employee.sessionsCompleted}</span>
-                            <span className="px-4 py-3">{employee.averageScore == null ? '-' : `${employee.averageScore} ${t('reportScoreOutOf')}`}</span>
-                            <span className="px-4 py-3">{formatDate(employee.lastActivity, lang)}</span>
-                          </button>
-                        </td>
-                      </tr>
-                      {expandedEmployees[employee.id] && (
-                        <tr><td colSpan={4} className="bg-slate-900/70 px-5 py-2"><EmployeeSessions employee={employee} locale={lang} t={t} /></td></tr>
-                      )}
-                    </Fragment>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </>
-        )}
-      </section>
+      {activeTab === 'insights' && (
+        <section>
+          <h2 className="mb-4 text-xl font-semibold text-white">{t('adminWeakSpotsTitle')}</h2>
+          {summary.weakSpots && summary.weakSpots.length > 0 ? (
+            <ul className="space-y-2">
+              {summary.weakSpots.map(ws => (
+                <li key={ws.checkpointId} className="bg-slate-800 p-3 rounded">
+                  <p className="font-medium text-white">{ws.description[lang] || ws.description.en}</p>
+                  <div className="mt-1 flex items-center">
+                    <div className="flex-1 h-2 bg-slate-700 rounded" aria-hidden="true">
+                      <div className="h-full bg-amber-500" style={{ width: `${ws.passRate * 100}%` }}></div>
+                    </div>
+                    <span className="ml-2 text-sm text-slate-200">{(ws.passRate*100).toFixed(0)}%</span>
+                    <span className="ml-2 text-sm text-slate-400">{t('adminSample')}: {ws.sample}</span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-slate-300">{t('adminWeakSpotsEmpty')}</p>
+          )}
+        </section>
+      )}
+
+      {activeTab === 'settings' && (
+        <section>
+          <h2 className="mb-4 text-xl font-semibold text-white">{t('adminSettings')}</h2>
+          {/* Additional settings could be added here */}
+        </section>
+      )}
     </main>
   )
 }

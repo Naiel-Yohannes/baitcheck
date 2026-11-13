@@ -9,17 +9,19 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Report from './pages/Report'
 import Scenarios from './pages/Scenarios'
+import Dashboard from './pages/Dashboard'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<Layout />}>
-          <Route path="/"         element={<Navigate to="/scenarios" replace />} />
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
           <Route path="/login"    element={<Login />} />
           <Route path="/register" element={<Register />} />
 
           <Route element={<RequireAuth />}>
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/scenarios"         element={<Scenarios />} />
             <Route path="/chat/:sessionId"   element={<Chat />} />
             <Route path="/report/:sessionId" element={<Report />} />
@@ -30,7 +32,7 @@ export default function App() {
             </Route>
           </Route>
 
-          <Route path="*" element={<Navigate to="/scenarios" replace />} />
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
