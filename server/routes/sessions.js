@@ -234,6 +234,7 @@ export function createSessionsRouter({ requireAuth, rateLimits, store, ai, repo 
         score: report.score,
         band: report.band,
         report,
+        checkpointSummary: report.checkpoints.map(({ id, status }) => ({ id, status })),
       },
     })
     if (!updated) {

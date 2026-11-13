@@ -60,10 +60,13 @@ describe('Session model', () => {
       scenarioId: 'urgent-bank-call',
       language: 'en',
       messages: [{ role: 'attacker', text: 'Hello', stageIndex: 0 }],
+      checkpointSummary: [{ id: 'refuse_code', status: 'passed' }],
     })
 
     expect(session.validateSync()).toBeUndefined()
     expect(session.messages[0]._id).toBeUndefined()
+    expect(session.checkpointSummary[0]._id).toBeUndefined()
+    expect(session.checkpointSummary[0].toObject()).toEqual({ id: 'refuse_code', status: 'passed' })
   })
 
   it('rejects a bad language and a bad status', () => {
@@ -82,5 +85,7 @@ describe('Session model', () => {
     expect(session.turnCount).toBe(0)
     expect(session.score).toBeNull()
     expect(session.report).toBeNull()
+    expect(session.checkpointSummary).toEqual([])
+    expect(session.checkpointSummary).not.toHaveProperty('_id')
   })
 })

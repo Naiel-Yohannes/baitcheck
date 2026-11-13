@@ -30,15 +30,18 @@ function createFakeModel(docs) {
   }
 }
 
-function tinyOrgApp({ employees = [], sessions = [] } = {}) {
-  const UserModel = createFakeModel(employees)
+function tinyOrgApp({ employees = [], sessions = [], UserModel, OrgModel, now } = {}) {
+  const users = UserModel ?? createFakeModel(employees)
   const SessionModel = createFakeModel(sessions)
   const app = express()
   app.use('/api/org', createOrgRouter({
     requireAuth: fakeRequireAuth,
-    UserModel,
+    UserModel: users,
     SessionModel,
+    OrgModel,
     getScenarioTitle: (id) => `Title ${id}`,
+    getCheckpointDescription: () => ({ en: 'The user can report the caller', am: 'ሪፖርት' }),
+    now: now ?? (() => new Date('2026-03-04T12:00:00.000Z')),
   }))
   app.use((err, _req, res, _next) => {
     if (err instanceof AppError) {
@@ -50,7 +53,7 @@ function tinyOrgApp({ employees = [], sessions = [] } = {}) {
       error: { code: 'SERVER_ERROR', message: 'An unexpected error occurred.' },
     })
   })
-  return { app, UserModel, SessionModel }
+  return { app, UserModel: users, SessionModel }
 }
 
 describe('GET /api/org/summary', () => {
@@ -105,6 +108,20 @@ describe('GET /api/org/summary', () => {
           finishedAt,
         }],
       }],
+      scoreDistribution: { vulnerable: 0, partial: 0, resilient: 0, strong: 1 },
+      byScenario: [{ scenarioId: 'phish-1', scenarioTitle: 'Title phish-1', completed: 1, averageScore: 80 }],
+      trend: [
+        { weekStart: '2026-01-12', completed: 0, averageScore: null },
+        { weekStart: '2026-01-19', completed: 0, averageScore: null },
+        { weekStart: '2026-01-26', completed: 1, averageScore: 80 },
+        { weekStart: '2026-02-02', completed: 0, averageScore: null },
+        { weekStart: '2026-02-09', completed: 0, averageScore: null },
+        { weekStart: '2026-02-16', completed: 0, averageScore: null },
+        { weekStart: '2026-02-23', completed: 0, averageScore: null },
+        { weekStart: '2026-03-02', completed: 0, averageScore: null },
+      ],
+      weakSpots: [],
+      improvement: null,
     })
 
     expect(UserModel.calls.find).toEqual([{ orgId: 'org1', role: 'employee' }])
@@ -116,8 +133,45 @@ describe('GET /api/org/summary', () => {
     const sessionSelect = SessionModel.calls.select[0]
     expect(typeof sessionSelect).toBe('string')
     expect(sessionSelect).toContain('score')
+    expect(sessionSelect).toContain('checkpointSummary')
     expect(sessionSelect).not.toContain('messages')
     expect(sessionSelect).not.toContain('report')
+  })
+
+  it('excludes the admin and drops private keys even when checkpoint text says report', async () => {
+    const finishedAt = '2026-02-10T00:00:00.000Z'
+    const checkpointSummary = [{ id: 'leak', status: 'failed' }]
+    const { app } = tinyOrgApp({
+      employees: [{ _id: 'emp1', name: 'Ada' }],
+      sessions: [
+        { userId: 'emp1', scenarioId: 'phish-1', language: 'en', score: 10, band: 'vulnerable', finishedAt, checkpointSummary, messages: [{ text: 'secret' }], report: { evidence: 'quote' } },
+        { userId: 'emp1', scenarioId: 'phish-1', language: 'en', score: 20, band: 'vulnerable', finishedAt, checkpointSummary },
+        { userId: 'emp1', scenarioId: 'phish-1', language: 'en', score: 30, band: 'vulnerable', finishedAt, checkpointSummary },
+        { userId: 'admin', scenarioId: 'phish-1', language: 'en', score: 0, band: 'vulnerable', finishedAt, checkpointSummary },
+      ],
+    })
+    const res = await request(app).get('/api/org/summary').set('x-test-role', 'orgAdmin')
+    expect(res.status).toBe(200)
+    expect(res.body.completedSessions).toBe(3)
+    expect(res.body.averageScore).toBe(20)
+    expect(res.body.weakSpots[0]).toMatchObject({
+      checkpointId: 'leak',
+      description: { en: 'The user can report the caller', am: 'ሪፖርት' },
+      passRate: 0,
+      sample: 3,
+    })
+    const names = new Set()
+    const walk = (value) => {
+      if (!value || typeof value !== 'object') return
+      for (const key of Object.keys(value)) {
+        names.add(key)
+        walk(value[key])
+      }
+    }
+    walk(res.body)
+    for (const forbidden of ['messages', 'report', 'feedback', 'evidence', 'transcript', 'email', 'userId']) {
+      expect(names.has(forbidden)).toBe(false)
+    }
   })
 
   it('returns 404 when an orgAdmin has no org', async () => {
@@ -130,5 +184,114 @@ describe('GET /api/org/summary', () => {
     expect(res.body.error.code).toBe('NOT_FOUND')
     expect(UserModel.calls.find).toEqual([])
     expect(SessionModel.calls.find).toEqual([])
+  })
+})
+
+const EMPLOYEE_ID = '507f1f77bcf86cd799439011'
+
+function notFoundBody() {
+  return { error: { code: 'NOT_FOUND', message: 'The requested resource was not found.' } }
+}
+
+describe('POST /api/org/rotate-code', () => {
+  it('returns 403 for an employee and an individual', async () => {
+    for (const role of ['employee', 'individual']) {
+      const { app } = tinyOrgApp()
+      const res = await request(app).post('/api/org/rotate-code').set('x-test-role', role)
+      expect(res.status).toBe(403)
+      expect(res.headers['cache-control']).toBe('no-store')
+      expect(res.body.error.code).toBe('FORBIDDEN')
+    }
+  })
+
+  it('saves a new code after a duplicate-key retry and returns only that code', async () => {
+    const duplicate = Object.assign(new Error('duplicate'), { code: 11000 })
+    const calls = []
+    const OrgModel = {
+      async findOneAndUpdate(filter, update) {
+        calls.push({ filter, update })
+        if (calls.length === 1) throw duplicate
+        return { _id: filter._id, joinCode: update.$set.joinCode }
+      },
+    }
+    const { app } = tinyOrgApp({ OrgModel })
+    const res = await request(app).post('/api/org/rotate-code').set('x-test-role', 'orgAdmin')
+    expect(res.status).toBe(200)
+    expect(res.headers['cache-control']).toBe('no-store')
+    expect(calls).toHaveLength(2)
+    expect(calls[0].filter).toEqual({ _id: 'org1' })
+    expect(calls[1].update.$set.joinCode).toHaveLength(6)
+    expect(calls[1].update.$set.joinCode).not.toBe('ABC234')
+    expect(res.body).toEqual({ joinCode: calls[1].update.$set.joinCode })
+  })
+
+  it('returns 404 when the admin has no org', async () => {
+    const { app } = tinyOrgApp()
+    const res = await request(app).post('/api/org/rotate-code').set('x-test-role', 'orgAdmin').set('x-test-noorg', '1')
+    expect(res.status).toBe(404)
+    expect(res.body).toEqual(notFoundBody())
+  })
+})
+
+describe('DELETE /api/org/employees/:id', () => {
+  function userModel(result) {
+    const calls = []
+    return {
+      calls,
+      find() {
+        return { select: () => ({ lean: async () => [] }) }
+      },
+      async findOneAndUpdate(filter, update) {
+        calls.push({ filter, update })
+        return result
+      },
+    }
+  }
+
+  it('returns 403 for an employee and an individual', async () => {
+    for (const role of ['employee', 'individual']) {
+      const { app } = tinyOrgApp()
+      const res = await request(app).delete(`/api/org/employees/${EMPLOYEE_ID}`).set('x-test-role', role)
+      expect(res.status).toBe(403)
+      expect(res.headers['cache-control']).toBe('no-store')
+      expect(res.body.error.code).toBe('FORBIDDEN')
+    }
+  })
+
+  it('clears the org and role for an employee in this org', async () => {
+    const UserModel = userModel({ _id: EMPLOYEE_ID })
+    const { app } = tinyOrgApp({ UserModel })
+    const res = await request(app).delete(`/api/org/employees/${EMPLOYEE_ID}`).set('x-test-role', 'orgAdmin')
+    expect(res.status).toBe(200)
+    expect(res.headers['cache-control']).toBe('no-store')
+    expect(res.body).toEqual({ ok: true })
+    expect(UserModel.calls).toEqual([{
+      filter: { _id: EMPLOYEE_ID, orgId: 'org1', role: 'employee' },
+      update: { $set: { orgId: null, role: 'individual' } },
+    }])
+  })
+
+  it('returns the same 404 for an unknown id, a non-employee, and an invalid id', async () => {
+    const unknown = userModel(null)
+    const unknownRes = await request(tinyOrgApp({ UserModel: unknown }).app)
+      .delete(`/api/org/employees/${EMPLOYEE_ID}`)
+      .set('x-test-role', 'orgAdmin')
+    const invalid = userModel({ _id: 'should-not-update' })
+    const invalidRes = await request(tinyOrgApp({ UserModel: invalid }).app)
+      .delete('/api/org/employees/abc')
+      .set('x-test-role', 'orgAdmin')
+    const missingOrg = await request(tinyOrgApp().app)
+      .delete(`/api/org/employees/${EMPLOYEE_ID}`)
+      .set('x-test-role', 'orgAdmin')
+      .set('x-test-noorg', '1')
+
+    expect(unknownRes.status).toBe(404)
+    expect(invalidRes.status).toBe(404)
+    expect(missingOrg.status).toBe(404)
+    expect(unknownRes.body).toEqual(notFoundBody())
+    expect(invalidRes.body).toEqual(unknownRes.body)
+    expect(missingOrg.body).toEqual(unknownRes.body)
+    expect(unknown.calls[0].filter).toEqual({ _id: EMPLOYEE_ID, orgId: 'org1', role: 'employee' })
+    expect(invalid.calls).toEqual([])
   })
 })

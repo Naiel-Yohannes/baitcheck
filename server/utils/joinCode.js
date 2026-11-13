@@ -29,3 +29,24 @@ export async function createOrgWithUniqueCode({ name, createdBy }, OrgModel = Or
 
   throw new Error('Could not generate a unique organization join code after 5 attempts')
 }
+
+export async function rotateOrgJoinCode(orgId, OrgModel = Org) {
+  for (let attempt = 0; attempt < 5; attempt += 1) {
+    try {
+      const updated = await OrgModel.findOneAndUpdate(
+        { _id: orgId },
+        { $set: { joinCode: generateJoinCode() } },
+        { new: true },
+      )
+      if (!updated) return null
+      return updated.joinCode
+    } catch (err) {
+      if (err?.code !== 11000) throw err
+      if (attempt === 4) {
+        throw new Error('Could not generate a unique organization join code after 5 attempts')
+      }
+    }
+  }
+
+  throw new Error('Could not generate a unique organization join code after 5 attempts')
+}

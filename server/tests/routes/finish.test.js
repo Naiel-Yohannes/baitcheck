@@ -45,7 +45,7 @@ function createMemoryRepo({ initial = [], loseRace = false } = {}) {
         return null
       }
       stored.status = 'finished'
-      for (const key of ['finishedAt', 'endReason', 'score', 'band', 'report']) stored[key] = set[key]
+      for (const key of ['finishedAt', 'endReason', 'score', 'band', 'report', 'checkpointSummary']) stored[key] = set[key]
       return structuredClone(stored)
     },
   }
@@ -145,6 +145,12 @@ describe('POST /api/sessions/:id/finish', () => {
     expect(stored.score).toBe(first.body.report.score)
     expect(stored.band).toBe(first.body.report.band)
     expect(stored.report).toEqual(first.body.report)
+    expect(stored.checkpointSummary).toEqual(
+      first.body.report.checkpoints.map(({ id, status }) => ({ id, status })),
+    )
+    for (const item of stored.checkpointSummary) {
+      expect(Object.keys(item).sort()).toEqual(['id', 'status'])
+    }
     expect(stored.messages).toEqual(originalMessages)
     expect(ctx.finishLimiter.calls).toBe(1)
     const calls = [judge.mock.calls.length, feedback.mock.calls.length]

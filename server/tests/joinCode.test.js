@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest'
-import { createOrgWithUniqueCode, generateJoinCode, JOIN_CODE_ALPHABET } from '../utils/joinCode.js'
+import { createOrgWithUniqueCode, generateJoinCode, rotateOrgJoinCode, JOIN_CODE_ALPHABET } from '../utils/joinCode.js'
 
 describe('generateJoinCode', () => {
   it('returns six characters from the alphabet over 500 calls', () => {
@@ -34,5 +34,26 @@ describe('createOrgWithUniqueCode', () => {
 
     await expect(createOrgWithUniqueCode({ name: 'BaitCheck', createdBy: 'user-id' }, OrgModel)).rejects.toThrow(Error)
     expect(OrgModel.create).toHaveBeenCalledTimes(5)
+  })
+})
+
+describe('rotateOrgJoinCode', () => {
+  it('retries a duplicate key and returns the saved code', async () => {
+    const duplicateKey = Object.assign(new Error('duplicate key'), { code: 11000 })
+    const OrgModel = {
+      findOneAndUpdate: vi.fn()
+        .mockRejectedValueOnce(duplicateKey)
+        .mockImplementationOnce((_filter, update) => Promise.resolve({ joinCode: update.$set.joinCode })),
+    }
+
+    const joinCode = await rotateOrgJoinCode('org1', OrgModel)
+    expect(OrgModel.findOneAndUpdate).toHaveBeenCalledTimes(2)
+    expect(joinCode).toHaveLength(6)
+    expect(OrgModel.findOneAndUpdate.mock.calls[1][1].$set.joinCode).toBe(joinCode)
+  })
+
+  it('returns null when the organization no longer exists', async () => {
+    const OrgModel = { findOneAndUpdate: vi.fn().mockResolvedValue(null) }
+    await expect(rotateOrgJoinCode('missing', OrgModel)).resolves.toBeNull()
   })
 })

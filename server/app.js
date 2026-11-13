@@ -45,6 +45,7 @@ export function createApp(config, deps = {}) {
 
   app.use('/api/org', createOrgRouter({
     requireAuth: app.locals.requireAuth,
+    store: deps.scenarios,
     getScenarioTitle: deps.getScenarioTitle ?? (deps.scenarios
       ? (id, language) => deps.scenarios.getTitle(id, language)
       : undefined),

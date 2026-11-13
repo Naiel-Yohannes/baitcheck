@@ -13,6 +13,14 @@ const messageSchema = new mongoose.Schema({
   },
 }, { _id: false })
 
+const checkpointSummarySchema = new mongoose.Schema({
+  id: String,
+  status: {
+    type: String,
+    enum: ['passed', 'failed', 'na', 'unjudged'],
+  },
+}, { _id: false })
+
 const sessionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -68,6 +76,10 @@ const sessionSchema = new mongoose.Schema({
   report: {
     type: mongoose.Schema.Types.Mixed,
     default: null,
+  },
+  checkpointSummary: {
+    type: [checkpointSummarySchema],
+    default: [],
   },
   createdAt: {
     type: Date,
