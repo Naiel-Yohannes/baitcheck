@@ -91,6 +91,13 @@ export const strings = {
     passwordRuleSymbol: 'Include a special symbol',
     passwordProblemCommon: 'Password is too common.',
     passwordProblemContainsEmail: 'Password contains part of your email.',
+    passwordStrengthWeak: 'Weak',
+    passwordStrengthMedium: 'Medium',
+    passwordStrengthStrong: 'Strong',
+    passwordDialogTitle: 'Choose a stronger password',
+    passwordDialogBody: 'Your password needs to meet these requirements:',
+    passwordDialogClose: 'OK',
+    passwordRejected: 'Please choose a different password.',
 
     validEmailRequired:     'Please enter a valid email address.',
     validPasswordRequired:  'Password must be at least 8 characters.',
@@ -304,6 +311,13 @@ export const strings = {
     passwordRuleSymbol: 'ልዩ ምልክት ይጨምሩ', // needs native review
     passwordProblemCommon: 'የይለፍ ቃል በጣም ተለምዶ ነው።', // needs native review
     passwordProblemContainsEmail: 'የይለፍ ቃል የኢሜይልን ክፍል ይዟል።', // needs native review
+    passwordStrengthWeak: 'ደካማ', // needs native review
+    passwordStrengthMedium: 'መካከለኛ', // needs native review
+    passwordStrengthStrong: 'ጠንካራ', // needs native review
+    passwordDialogTitle: 'ጠንካራ የይለፍ ቃል ይምረጡ', // needs native review
+    passwordDialogBody: 'የይለፍ ቃልዎ የሚከተሉትን መስፈርቶች ማሟላት አለበት፦', // needs native review
+    passwordDialogClose: 'እሺ', // needs native review
+    passwordRejected: 'እባክዎ ሌላ የይለፍ ቃል ይምረጡ።', // needs native review
 
     validEmailRequired:     'እባክዎ ትክክለኛ ኢሜይል አድራሻ ያስገቡ።',
     fieldPassword:          'የይለፍ ቃል',

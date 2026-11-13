@@ -4,9 +4,17 @@ import { useAuth } from '../context/AuthContext'
 import { useLang } from '../context/LanguageContext'
 import { errorText } from '../errorText'
 import PasswordField from '../components/PasswordField'
-import { evaluatePassword } from '../lib/passwordStrength'
 
 const TYPES = ['individual', 'create', 'join']
+const PASSWORD_ISSUE_KEYS = {
+  PASSWORD_TOO_SHORT: 'passwordRuleLength',
+  PASSWORD_NEEDS_LOWERCASE: 'passwordRuleLowercase',
+  PASSWORD_NEEDS_UPPERCASE: 'passwordRuleUppercase',
+  PASSWORD_NEEDS_DIGIT: 'passwordRuleDigit',
+  PASSWORD_NEEDS_SYMBOL: 'passwordRuleSymbol',
+  PASSWORD_TOO_COMMON: 'passwordProblemCommon',
+  PASSWORD_CONTAINS_EMAIL: 'passwordProblemContainsEmail',
+}
 
 function isValidEmail(v) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim())
@@ -139,6 +147,7 @@ export default function Register() {
 
   const [errors,  setErrors]  = useState({})
   const [formErr, setFormErr] = useState('')
+  const [passwordIssues, setPasswordIssues] = useState([])
 
   const [pending,   setPending]   = useState(false)
   const [successCode, setSuccessCode] = useState(null)
@@ -147,6 +156,7 @@ export default function Register() {
     setAccountType(type)
     setErrors({})
     setFormErr('')
+    setPasswordIssues([])
   }
 
   if (user && successCode === null && !creatingOrgRef.current) return <Navigate to="/scenarios" replace />
@@ -157,7 +167,6 @@ export default function Register() {
     if (name.trim().length < 2)  errs.name     = t('validNameRequired')
     if (name.trim().length > 60) errs.name     = t('validNameTooLong')
     if (!isValidEmail(email))    errs.email    = t('validEmailRequired')
-    if (password.length < 8)     errs.password = t('validPasswordRequired')
     if (password.length > 72)    errs.password = t('validPasswordTooLong')
 
     if (accountType === 'create') {
@@ -175,6 +184,7 @@ export default function Register() {
   async function handleSubmit(e) {
     e.preventDefault()
     setFormErr('')
+    setPasswordIssues([])
 
     const errs = validate()
     if (Object.keys(errs).length) {
@@ -209,20 +219,27 @@ export default function Register() {
         setErrors({ email: t('error_EMAIL_TAKEN') })
       } else if (err.code === 'VALIDATION_ERROR' && Array.isArray(err.details)) {
         const fieldErrs = {}
+        const rejectedPasswordIssues = new Set()
         for (const { field, issue } of err.details) {
+          if (field === 'password') {
+            rejectedPasswordIssues.add(issue)
+            continue
+          }
           const key = field === 'orgName'  ? 'orgName'
                     : field === 'joinCode' ? 'joinCode'
                     : field === 'name'     ? 'name'
                     : field === 'email'    ? 'email'
-                    : field === 'password' ? 'password'
                     : null
           if (key) {
             fieldErrs[key] = issue ?? t('validFieldInvalid')
           }
         }
+        if (rejectedPasswordIssues.size) {
+          setPasswordIssues([...rejectedPasswordIssues])
+        }
         if (Object.keys(fieldErrs).length) {
           setErrors(fieldErrs)
-        } else {
+        } else if (!rejectedPasswordIssues.size) {
           setFormErr(t('error_VALIDATION_ERROR'))
         }
       } else {
@@ -288,6 +305,38 @@ export default function Register() {
 
           <FormError msg={formErr} />
 
+          {passwordIssues.length > 0 && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
+              <div
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="password-policy-title"
+                className="w-full max-w-sm rounded-xl border border-gray-700 bg-gray-900 p-6 shadow-2xl"
+              >
+                <h2 id="password-policy-title" className="text-lg font-semibold text-white">
+                  {t('passwordDialogTitle')}
+                </h2>
+                <p className="mt-2 text-sm text-gray-300">
+                  {t('passwordDialogBody')}
+                </p>
+                <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-300">
+                  {[...new Set(passwordIssues)].map(issue => (
+                    <li key={issue}>
+                      {t(PASSWORD_ISSUE_KEYS[issue] ?? 'passwordRejected')}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  type="button"
+                  onClick={() => setPasswordIssues([])}
+                  className="mt-5 min-h-[44px] rounded-lg bg-indigo-600 px-5 text-sm font-semibold text-white hover:bg-indigo-500"
+                >
+                  {t('passwordDialogClose')}
+                </button>
+              </div>
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-5">
             <InputField
               id="reg-name"
@@ -315,7 +364,11 @@ export default function Register() {
             <PasswordField
               id="reg-password"
               value={password}
-              onChange={e => { setField('password', e.target.value); setErrors(v => ({ ...v, password: '' })) }}
+              onChange={e => {
+                setField('password', e.target.value)
+                setErrors(v => ({ ...v, password: '' }))
+                setPasswordIssues([])
+              }}
               email={email}
               name={name}
               disabled={pending}

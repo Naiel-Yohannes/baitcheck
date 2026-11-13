@@ -1,8 +1,8 @@
 // client/src/components/PasswordField.jsx
 import { useLang } from '../context/LanguageContext'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
-import { evaluatePassword, RULES } from '../lib/passwordStrength'
+import { evaluatePassword } from '../lib/passwordStrength'
 // generatePassword utility is defined inline below
 
 /**
@@ -11,17 +11,12 @@ import { evaluatePassword, RULES } from '../lib/passwordStrength'
  */
 export default function PasswordField({ value, onChange, email, name, disabled, error, id }) {
   const { t } = useLang()
-  const [evalResult, setEvalResult] = useState(() => evaluatePassword('', { email, name }))
+  const evalResult = evaluatePassword(value, { email, name })
   const [show, setShow] = useState(false)
-
-  useEffect(() => {
-    setEvalResult(evaluatePassword(value, { email, name }))
-  }, [value, email, name])
 
   const toggleShow = () => setShow(s => !s)
 
   const barColor = {
-    empty: 'bg-gray-600',
     weak:  'bg-red-600',
     fair:  'bg-orange-500',
     good:  'bg-yellow-400',
@@ -36,16 +31,12 @@ export default function PasswordField({ value, onChange, email, name, disabled, 
     transition: prefersReduced ? 'none' : 'width 0.4s ease',
   }
 
-  const getRuleLabel = (ruleId) => {
-    const map = {
-      [RULES.LENGTH]:            t('passwordRuleLength'),
-      [RULES.LOWERCASE]:        t('passwordRuleLowercase'),
-      [RULES.UPPERCASE]:        t('passwordRuleUppercase'),
-      [RULES.DIGIT]:            t('passwordRuleDigit'),
-      [RULES.SYMBOL]:           t('passwordRuleSymbol'),
-    }
-    return map[ruleId] || ruleId
-  }
+  const strengthKey = {
+    weak: 'passwordStrengthWeak',
+    fair: 'passwordStrengthMedium',
+    good: 'passwordStrengthMedium',
+    strong: 'passwordStrengthStrong',
+  }[evalResult.level]
 
   return (
     <div className="space-y-2">
@@ -70,32 +61,15 @@ export default function PasswordField({ value, onChange, email, name, disabled, 
           {show ? '🙈' : '👁'}
         </button>
       </div>
-      {/* Strength bar */}
-      <div className="h-2 w-full bg-gray-700 rounded" role="meter" aria-valuenow={evalResult.score} aria-valuemin="0" aria-valuemax="100">
-        <div
-          className={`h-full ${barColor}`}
-          style={barStyle}
-        />
-      </div>
-      {/* Text label */}
-      <div aria-live="polite" className="text-sm font-medium text-gray-300">
-        {evalResult.level.charAt(0).toUpperCase() + evalResult.level.slice(1)}
-      </div>
-      {/* Checklist */}
-      <ul className="list-none space-y-1 text-xs">
-        {Object.entries(evalResult.passed).map(([ruleId, ok]) => (
-          <li key={ruleId} className={`flex items-center ${ok ? 'text-green-400' : 'text-red-400'}`}>
-            <span className={`mr-1 ${ok ? '✓' : '✗'}`} />
-            {getRuleLabel(ruleId)}
-          </li>
-        ))}
-      </ul>
-      {/* Problems */}
-      {evalResult.problems.includes(RULES.COMMON) && (
-        <p className="text-xs text-orange-300">{t('passwordProblemCommon')}</p>
-      )}
-      {evalResult.problems.includes(RULES.CONTAINS_EMAIL) && (
-        <p className="text-xs text-orange-300">{t('passwordProblemContainsEmail')}</p>
+      {value.length > 0 && (
+        <>
+          <div className="h-2 w-full rounded bg-gray-700" role="meter" aria-valuenow={evalResult.score} aria-valuemin="0" aria-valuemax="100">
+            <div className={`h-full rounded ${barColor}`} style={barStyle} />
+          </div>
+          <div aria-live="polite" className="text-sm font-medium text-gray-300">
+            {t(strengthKey)}
+          </div>
+        </>
       )}
       {/* Generate button */}
       <button
