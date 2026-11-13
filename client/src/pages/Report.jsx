@@ -84,12 +84,32 @@ function HeaderCard({ report, t }) {
         <span className="text-lg text-gray-500 pb-1">{t('reportScoreOutOf')}</span>
       </div>
 
-      <div className="w-full h-2.5 bg-gray-800 rounded-full overflow-hidden mb-3">
-        <div
-          role="presentation"
-          className={`h-full rounded-full transition-all ${bandCfg ? bandCfg.bar : 'bg-gray-600'}`}
-          style={{ width: `${score}%` }}
-        />
+      {/* Circular gauge */}
+      <div className="relative w-24 h-24 mx-auto mb-4">
+        <svg className="w-full h-full" viewBox="0 0 36 36">
+          <circle cx="18" cy="18" r="16" stroke="#2d2d2d" strokeWidth="4" fill="none" className="text-gray-800"/>
+          <circle
+            cx="18"
+            cy="18"
+            r="16"
+            stroke={bandCfg ? bandCfg.bar : '#555'}
+            strokeWidth="4"
+            fill="none"
+            className="stroke-current transition-colors duration-500"
+            strokeDasharray="100"
+            strokeDashoffset={100 - score}
+            style={{ transition: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'none' : 'stroke-dashoffset 1s ease-out' }}
+          />
+          <text x="18" y="21" textAnchor="middle" className="text-white text-sm font-medium" dominantBaseline="middle">
+            {score}
+          </text>
+        </svg>
+        {/* Celebration for strong band */}
+        {band === 'strong' && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none animate-pulse">
+            <span className="text-2xl text-indigo-300" aria-hidden>★</span>
+          </div>
+        )}
       </div>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
