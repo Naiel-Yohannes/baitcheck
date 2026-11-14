@@ -370,6 +370,18 @@ export default function Register() {
                 setErrors(v => ({ ...v, password: '' }))
                 setPasswordIssues([])
               }}
+              onGenerate={generated => {
+                setFormValues(current => ({
+                  ...current,
+                  [accountType]: {
+                    ...current[accountType],
+                    password: generated,
+                    confirmPassword: generated,
+                  },
+                }))
+                setErrors(v => ({ ...v, password: '', confirmPassword: '' }))
+                setPasswordIssues([])
+              }}
               email={email}
               name={name}
               disabled={pending}

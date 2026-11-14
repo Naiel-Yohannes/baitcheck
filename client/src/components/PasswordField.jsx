@@ -9,7 +9,7 @@ import { evaluatePassword } from '../lib/passwordStrength'
  * Props:
  *   value, onChange, email, name, disabled, error, id
  */
-export default function PasswordField({ value, onChange, email, name, disabled, error, id }) {
+export default function PasswordField({ value, onChange, onGenerate, email, name, disabled, error, id }) {
   const { t } = useLang()
   const evalResult = evaluatePassword(value, { email, name })
   const [show, setShow] = useState(false)
@@ -40,6 +40,9 @@ export default function PasswordField({ value, onChange, email, name, disabled, 
 
   return (
     <div className="space-y-2">
+      <label htmlFor={id} className="block text-sm font-medium text-gray-300">
+        {t('fieldPassword')}
+      </label>
       <div className="relative flex items-center">
         <input
           id={id}
@@ -78,8 +81,11 @@ export default function PasswordField({ value, onChange, email, name, disabled, 
         type="button"
         onClick={() => {
           const gen = generatePassword(16)
-          const e = { target: { value: gen } }
-          onChange(e)
+          if (onGenerate) {
+            onGenerate(gen)
+          } else {
+            onChange({ target: { value: gen } })
+          }
         }}
         disabled={disabled}
         className="mt-1 min-h-[44px] px-3 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium transition-colors disabled:opacity-60"
