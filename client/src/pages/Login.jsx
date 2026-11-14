@@ -41,7 +41,7 @@ export default function Login() {
   const [formErr,  setFormErr]  = useState('')
   const [pending,  setPending]  = useState(false)
 
-  if (user) return <Navigate to="/scenarios" replace />
+  if (user) return <Navigate to={user.role === 'orgAdmin' ? '/admin' : '/scenarios'} replace />
 
   function validate() {
     const errs = {}
@@ -63,8 +63,10 @@ export default function Login() {
 
     setPending(true)
     try {
-      await login({ email: email.trim(), password })
-      const dest = location.state?.from?.pathname ?? '/scenarios'
+      const res = await login({ email: email.trim(), password })
+      const dest = res.user.role === 'orgAdmin'
+        ? '/admin'
+        : location.state?.from?.pathname ?? '/scenarios'
       navigate(dest, { replace: true })
     } catch (err) {
       setFormErr(errorText(err, t))
