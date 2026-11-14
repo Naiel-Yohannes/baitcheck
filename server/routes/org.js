@@ -75,6 +75,7 @@ export function createOrgRouter({
           checkpointSummary: doc.checkpointSummary ?? [],
         })),
         getScenarioTitle,
+        scenarioIds: store?.getAll?.().map(scenario => scenario.id) ?? [],
         getCheckpointDescription: describeCheckpoint,
         now: now(),
       })

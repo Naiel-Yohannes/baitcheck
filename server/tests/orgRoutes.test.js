@@ -30,7 +30,7 @@ function createFakeModel(docs) {
   }
 }
 
-function tinyOrgApp({ employees = [], sessions = [], UserModel, OrgModel, now } = {}) {
+function tinyOrgApp({ employees = [], sessions = [], scenarioIds = [], UserModel, OrgModel, now } = {}) {
   const users = UserModel ?? createFakeModel(employees)
   const SessionModel = createFakeModel(sessions)
   const app = express()
@@ -39,6 +39,7 @@ function tinyOrgApp({ employees = [], sessions = [], UserModel, OrgModel, now } 
     UserModel: users,
     SessionModel,
     OrgModel,
+    store: { getAll: () => scenarioIds.map(id => ({ id })) },
     getScenarioTitle: (id) => `Title ${id}`,
     getCheckpointDescription: () => ({ en: 'The user can report the caller', am: 'ሪፖርት' }),
     now: now ?? (() => new Date('2026-03-04T12:00:00.000Z')),
@@ -136,6 +137,27 @@ describe('GET /api/org/summary', () => {
     expect(sessionSelect).toContain('checkpointSummary')
     expect(sessionSelect).not.toContain('messages')
     expect(sessionSelect).not.toContain('report')
+  })
+
+  it('includes scenarios from the store even before employees complete them', async () => {
+    const { app } = tinyOrgApp({
+      employees: [{ _id: 'emp1', name: 'Ada' }],
+      sessions: [{
+        userId: 'emp1',
+        scenarioId: 'played',
+        language: 'en',
+        score: 60,
+        band: 'partial',
+        finishedAt: '2026-03-01T00:00:00.000Z',
+      }],
+      scenarioIds: ['played', 'new-scenario'],
+    })
+    const res = await request(app).get('/api/org/summary').set('x-test-role', 'orgAdmin')
+    expect(res.status).toBe(200)
+    expect(res.body.byScenario).toEqual([
+      { scenarioId: 'new-scenario', scenarioTitle: 'Title new-scenario', completed: 0, averageScore: null },
+      { scenarioId: 'played', scenarioTitle: 'Title played', completed: 1, averageScore: 60 },
+    ])
   })
 
   it('excludes the admin and drops private keys even when checkpoint text says report', async () => {

@@ -168,8 +168,10 @@ export default function Admin() {
   const score = summary.averageScore == null ? t('adminNoData') : `${summary.averageScore} ${t('reportScoreOutOf')}`
   const donutData = summary.scoreDistribution || { vulnerable:0, partial:0, resilient:0, strong:0 }
   const barItems = (summary.byScenario || []).map(item => ({
+    scenarioId: item.scenarioId,
     label: item.scenarioTitle,
     value: item.completed,
+    averageScore: item.averageScore,
     percent: summary.completedSessions ? (item.completed / summary.completedSessions) * 100 : 0,
   }))
 
@@ -177,12 +179,17 @@ export default function Admin() {
     <main className="mx-auto w-full max-w-6xl px-2 py-4 sm:px-0 sm:py-6">
       <h1 className="mb-6 text-3xl font-bold tracking-tight text-white">{t('headingAdmin')}</h1>
 
-      <nav className="mb-6 flex space-x-4" role="tablist">
-        <button role="tab" aria-selected={activeTab==='overview'} onClick={() => setActiveTab('overview')} className={`px-3 py-2 rounded ${activeTab==='overview' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabOverview')}</button>
-        <button role="tab" aria-selected={activeTab==='team'} onClick={() => setActiveTab('team')} className={`px-3 py-2 rounded ${activeTab==='team' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabTeam')}</button>
-        <button role="tab" aria-selected={activeTab==='insights'} onClick={() => setActiveTab('insights')} className={`px-3 py-2 rounded ${activeTab==='insights' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabInsights')}</button>
-        <button role="tab" aria-selected={activeTab==='settings'} onClick={() => setActiveTab('settings')} className={`px-3 py-2 rounded ${activeTab==='settings' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabSettings')}</button>
-      </nav>
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <nav className="flex flex-wrap gap-2" role="tablist">
+          <button role="tab" aria-selected={activeTab==='overview'} onClick={() => setActiveTab('overview')} className={`rounded px-3 py-2 ${activeTab==='overview' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabOverview')}</button>
+          <button role="tab" aria-selected={activeTab==='team'} onClick={() => setActiveTab('team')} className={`rounded px-3 py-2 ${activeTab==='team' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabTeam')}</button>
+          <button role="tab" aria-selected={activeTab==='insights'} onClick={() => setActiveTab('insights')} className={`rounded px-3 py-2 ${activeTab==='insights' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabInsights')}</button>
+          <button role="tab" aria-selected={activeTab==='settings'} onClick={() => setActiveTab('settings')} className={`rounded px-3 py-2 ${activeTab==='settings' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabSettings')}</button>
+        </nav>
+        <button type="button" onClick={() => setRetryKey(key => key + 1)} className="min-h-10 rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-200 hover:bg-slate-800">
+          {t('adminRefresh')}
+        </button>
+      </div>
 
       {activeTab === 'overview' && (
         <>
@@ -191,16 +198,18 @@ export default function Admin() {
             <StatCard label={t('adminCompletedSessions')} value={summary.completedSessions} />
             <StatCard label={t('adminEmployeeCount')} value={summary.employeeCount} />
           </section>
-          <section className="mb-8">
-            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminScoreDistribution')}</h2>
-            <DonutChart data={donutData} />
+          <section className="mb-8 grid gap-6 lg:grid-cols-2">
+            <article className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
+              <h2 className="mb-4 text-xl font-semibold text-white">{t('adminScoreDistribution')}</h2>
+              <DonutChart data={donutData} />
+            </article>
+            <article className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
+              <h2 className="mb-4 text-xl font-semibold text-white">{t('adminByScenario')}</h2>
+              <BarList items={barItems} />
+            </article>
           </section>
-          <section className="mb-8">
-            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminByScenario')}</h2>
-            <BarList items={barItems} />
-          </section>
-          <section className="mb-8">
-            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminWeeklyTrend')}</h2>
+          <section className="mb-8 rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
+            <h2 className="mb-4 text-xl font-semibold text-white">{t('adminWeeklyTrend')}</h2>
             <LineChart points={summary.trend || []} />
           </section>
         </>
@@ -247,26 +256,53 @@ export default function Admin() {
       )}
 
       {activeTab === 'insights' && (
-        <section>
-          <h2 className="mb-4 text-xl font-semibold text-white">{t('adminWeakSpotsTitle')}</h2>
-          {summary.weakSpots && summary.weakSpots.length > 0 ? (
-            <ul className="space-y-2">
-              {summary.weakSpots.map(ws => (
-                <li key={ws.checkpointId} className="bg-slate-800 p-3 rounded">
-                  <p className="font-medium text-white">{ws.description[lang] || ws.description.en}</p>
-                  <div className="mt-1 flex items-center">
-                    <div className="flex-1 h-2 bg-slate-700 rounded" aria-hidden="true">
-                      <div className="h-full bg-amber-500" style={{ width: `${ws.passRate * 100}%` }}></div>
+        <section className="space-y-6">
+          <div className="grid gap-6 lg:grid-cols-[minmax(0,1.5fr)_minmax(16rem,1fr)]">
+            <article className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
+              <h2 className="mb-2 text-xl font-semibold text-white">{t('adminByScenario')}</h2>
+              <p className="mb-4 text-sm text-slate-400">{t('adminScenarioInsightsHelp')}</p>
+              <BarList items={barItems} />
+            </article>
+            <article className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
+              <h2 className="mb-2 text-xl font-semibold text-white">{t('adminImprovementTitle')}</h2>
+              {summary.improvement ? (
+                <>
+                  <p className="mt-4 text-3xl font-bold text-white">
+                    {summary.improvement.averageDelta > 0 ? '+' : ''}{summary.improvement.averageDelta}
+                    <span className="ml-2 text-sm font-medium text-slate-400">{t('reportScoreOutOf')}</span>
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    {t('adminImprovementLearners')} {summary.improvement.learners}
+                  </p>
+                </>
+              ) : (
+                <p className="mt-4 text-sm text-slate-400">{t('adminImprovementEmpty')}</p>
+              )}
+            </article>
+          </div>
+          <article className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-5">
+            <h2 className="mb-2 text-xl font-semibold text-white">{t('adminWeakSpotsTitle')}</h2>
+            <p className="mb-4 text-sm text-slate-400">{t('adminWeakSpotsHelp')}</p>
+            {summary.weakSpots?.length > 0 ? (
+              <ul className="space-y-3">
+                {summary.weakSpots.map(ws => (
+                  <li key={`${ws.scenarioId}-${ws.checkpointId}`} className="rounded-xl bg-slate-800/70 p-4">
+                    <p className="text-xs font-medium text-violet-300">{ws.scenarioTitle}</p>
+                    <p className="mt-1 font-medium text-white">{ws.description[lang] || ws.description.en}</p>
+                    <div className="mt-3 flex items-center gap-3">
+                      <div className="h-2 flex-1 rounded-full bg-slate-700" aria-hidden="true">
+                        <div className="h-full rounded-full bg-amber-500" style={{ width: `${ws.passRate}%` }}></div>
+                      </div>
+                      <span className="text-sm text-slate-200">{ws.passRate}%</span>
+                      <span className="text-xs text-slate-400">{t('adminSample')}: {ws.sample}</span>
                     </div>
-                    <span className="ml-2 text-sm text-slate-200">{(ws.passRate*100).toFixed(0)}%</span>
-                    <span className="ml-2 text-sm text-slate-400">{t('adminSample')}: {ws.sample}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-slate-300">{t('adminWeakSpotsEmpty')}</p>
-          )}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-slate-300">{t('adminWeakSpotsEmpty')}</p>
+            )}
+          </article>
         </section>
       )}
 

@@ -65,6 +65,20 @@ describe('buildOrgSummary', () => {
     expect(result.employeeCount).toBe(1)
   })
 
+  it('includes newly available scenarios with no completed sessions', () => {
+    const result = summary({
+      scenarioIds: ['played', 'new-scenario'],
+      employees: [{ id: 'e1', name: 'Ada' }],
+      sessions: [
+        { userId: 'e1', scenarioId: 'played', language: 'en', score: 60, band: 'partial', finishedAt: '2026-03-01T00:00:00.000Z' },
+      ],
+    })
+    expect(result.byScenario).toEqual([
+      { scenarioId: 'new-scenario', scenarioTitle: 'Title new-scenario', completed: 0, averageScore: null },
+      { scenarioId: 'played', scenarioTitle: 'Title played', completed: 1, averageScore: 60 },
+    ])
+  })
+
   it('rounds an employee average of 73.5 to 74', () => {
     const result = summary({
       employees: [{ id: 'e1', name: 'Ada' }],

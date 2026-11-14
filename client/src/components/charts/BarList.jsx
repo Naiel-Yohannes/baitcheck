@@ -7,15 +7,25 @@ import { useLang } from '../../context/LanguageContext';
  */
 export default function BarList({ items }) {
   const { t } = useLang();
+  if (!items.length) return <p className="text-sm text-slate-400">{t('adminNoScenarioData')}</p>
+
   return (
-    <dl className="space-y-2 text-sm">
+    <dl className="space-y-3 text-sm">
       {items.map(item => (
-        <div key={item.label} className="flex items-center">
-          <dt className="w-1/3 flex-shrink-0 truncate mr-2" title={item.label}>{item.label}</dt>
-          <dd className="flex-1 mr-2 bg-slate-800 h-4 rounded" aria-hidden="true">
-            <div className="h-full bg-indigo-500" style={{ width: `${item.percent}%` }}></div>
+        <div key={item.scenarioId ?? item.label} className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_minmax(8rem,2fr)_auto] sm:items-center sm:gap-4">
+          <dt className="truncate font-medium text-slate-200" title={item.label}>{item.label}</dt>
+          <dd className="h-2 overflow-hidden rounded-full bg-slate-800" aria-hidden="true">
+            <div className="h-full rounded-full bg-indigo-500 transition-[width]" style={{ width: `${item.percent}%` }}></div>
           </dd>
-          <dd className="w-12 text-right">{item.value}</dd>
+          <dd className="text-xs text-slate-400 sm:min-w-36 sm:text-right">
+            {item.value} {t('adminSessionsShort')}
+            <span className="hidden sm:inline"> · </span>
+            <span className="block sm:inline">
+              {item.averageScore == null
+                ? t('adminNoScenarioScore')
+                : `${t('adminAverageScore')}: ${item.averageScore} ${t('reportScoreOutOf')}`}
+            </span>
+          </dd>
         </div>
       ))}
     </dl>

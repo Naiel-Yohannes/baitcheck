@@ -199,6 +199,18 @@ export const strings = {
     adminScoreDistributionChart: 'Score distribution chart',
     adminWeeklyTrendChart: 'Weekly trend chart',
     adminNoTrendData: 'No trend data available',
+    adminRefresh: 'Refresh data',
+    adminSessionsShort: 'sessions',
+    adminNoScenarioScore: 'No score yet',
+    adminNoScenarioData: 'No scenarios are available.',
+    adminWeeklyAverageScore: 'Average score',
+    adminWeeklySessions: 'Sessions completed',
+    adminScenarioInsightsHelp: 'Completion counts and average scores update for every available scenario.',
+    adminImprovementTitle: 'Learner improvement',
+    adminImprovementLearners: 'Learners with repeat practice:',
+    adminImprovementEmpty: 'Improvement appears after a learner completes the same scenario more than once.',
+    adminWeakSpotsHelp: 'A checkpoint appears after it has at least 3 passed or failed session results. Not-applicable and unevaluated results are excluded.',
+    adminWeakSpotsEmpty: 'No checkpoint has enough results to identify a weak spot yet.',
 
     reportCheckpoints:       'Checkpoints',
     checkpointPassed:        'Passed',
@@ -408,6 +420,18 @@ export const strings = {
     adminSessionsCompleted: 'የተጠናቀቁ ክፍለ ጊዜዎች',
     adminLastActivity: 'የመጨረሻ እንቅስቃሴ',
     adminNoCompletedSessions: 'ገና የተጠናቀቁ ክፍለ ጊዜዎች የሉም',
+    adminRefresh: 'መረጃውን አድስ', // needs native review
+    adminSessionsShort: 'ክፍለ ጊዜዎች', // needs native review
+    adminNoScenarioScore: 'እስካሁን ውጤት የለም', // needs native review
+    adminNoScenarioData: 'ምንም ሁኔታዎች የሉም።', // needs native review
+    adminWeeklyAverageScore: 'አማካይ ውጤት', // needs native review
+    adminWeeklySessions: 'የተጠናቀቁ ክፍለ ጊዜዎች', // needs native review
+    adminScenarioInsightsHelp: 'የሁሉም ዝግጁ ሁኔታዎች ብዛትና አማካይ ውጤት ይታያሉ።', // needs native review
+    adminImprovementTitle: 'የተማሪ መሻሻል', // needs native review
+    adminImprovementLearners: 'በተደጋጋሚ ልምምድ ያደረጉ ተማሪዎች:', // needs native review
+    adminImprovementEmpty: 'ተማሪው ተመሳሳይ ሁኔታን ከአንድ ጊዜ በላይ ሲያጠናቅቅ መሻሻል ይታያል።', // needs native review
+    adminWeakSpotsHelp: 'የፍተሻ ነጥብ ቢያንስ 3 ያለፉ ወይም ያልፈቀዱ የክፍለ ጊዜ ውጤቶች ሲኖሩት ይታያል። የማይመለከቱና ያልተገመገሙ ውጤቶች አይቆጠሩም።', // needs native review
+    adminWeakSpotsEmpty: 'ደካማ ነጥብ ለመለየት በቂ የፍተሻ ውጤቶች ገና የሉም።', // needs native review
 
     reportCheckpoints:       'የፍተሻ ነጥቦች',
     checkpointPassed:        'አለፈ',

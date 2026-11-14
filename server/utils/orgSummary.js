@@ -67,6 +67,7 @@ export function buildOrgSummary({
   employees,
   sessions,
   getScenarioTitle,
+  scenarioIds = [],
   getCheckpointDescription = () => null,
   now = new Date(),
 }) {
@@ -110,7 +111,7 @@ export function buildOrgSummary({
   const scoreDistribution = { vulnerable: 0, partial: 0, resilient: 0, strong: 0 }
   for (const session of counted) scoreDistribution[countedBand(session)] += 1
 
-  const byScenarioGroups = new Map()
+  const byScenarioGroups = new Map(scenarioIds.map(scenarioId => [scenarioId, []]))
   for (const session of counted) {
     if (!byScenarioGroups.has(session.scenarioId)) byScenarioGroups.set(session.scenarioId, [])
     byScenarioGroups.get(session.scenarioId).push(session)
@@ -118,10 +119,12 @@ export function buildOrgSummary({
   const byScenario = [...byScenarioGroups.entries()]
     .sort((a, b) => a[0].localeCompare(b[0]))
     .map(([scenarioId, group]) => {
-      const newest = group.slice().sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt))[0]
+      const newest = group.length
+        ? group.slice().sort((a, b) => new Date(b.finishedAt) - new Date(a.finishedAt))[0]
+        : null
       return {
         scenarioId,
-        scenarioTitle: resolveScenarioTitle(getScenarioTitle, scenarioId, newest.language),
+        scenarioTitle: resolveScenarioTitle(getScenarioTitle, scenarioId, newest?.language ?? 'en'),
         completed: group.length,
         averageScore: meanRounded(group.map(session => session.score)),
       }
