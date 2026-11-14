@@ -132,11 +132,11 @@ export default function Register() {
   const [accountType, setAccountType] = useState('individual')
 
   const [formValues, setFormValues] = useState({
-    individual: { name: '', email: '', password: '', orgName: '', joinCode: '' },
-    create: { name: '', email: '', password: '', orgName: '', joinCode: '' },
-    join: { name: '', email: '', password: '', orgName: '', joinCode: '' },
+    individual: { name: '', email: '', password: '', confirmPassword: '', orgName: '', joinCode: '' },
+    create: { name: '', email: '', password: '', confirmPassword: '', orgName: '', joinCode: '' },
+    join: { name: '', email: '', password: '', confirmPassword: '', orgName: '', joinCode: '' },
   })
-  const { name, email, password, orgName, joinCode } = formValues[accountType]
+  const { name, email, password, confirmPassword, orgName, joinCode } = formValues[accountType]
 
   function setField(field, value) {
     setFormValues(current => ({
@@ -168,6 +168,7 @@ export default function Register() {
     if (name.trim().length > 60) errs.name     = t('validNameTooLong')
     if (!isValidEmail(email))    errs.email    = t('validEmailRequired')
     if (password.length > 72)    errs.password = t('validPasswordTooLong')
+    if (password !== confirmPassword) errs.confirmPassword = t('validPasswordsDoNotMatch')
 
     if (accountType === 'create') {
       if (orgName.trim().length < 2)  errs.orgName = t('validOrgNameRequired')
@@ -373,6 +374,21 @@ export default function Register() {
               name={name}
               disabled={pending}
               error={errors.password}
+            />
+
+            <InputField
+              id="reg-confirm-password"
+              label={t('fieldConfirmPassword')}
+              type="password"
+              autoComplete="new-password"
+              value={confirmPassword}
+              onChange={e => {
+                setField('confirmPassword', e.target.value)
+                setErrors(v => ({ ...v, confirmPassword: '' }))
+              }}
+              disabled={pending}
+              error={errors.confirmPassword}
+              placeholder={t('confirmPasswordPlaceholder')}
             />
 
             {accountType === 'create' && (

@@ -44,9 +44,11 @@ export default function PasswordField({ value, onChange, email, name, disabled, 
         <input
           id={id}
           type={show ? 'text' : 'password'}
+          autoComplete="new-password"
           value={value}
           onChange={onChange}
           disabled={disabled}
+          placeholder={t('passwordPlaceholder')}
           aria-invalid={!!error}
           className={`w-full min-h-[44px] rounded-lg bg-gray-800 border px-3 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-colors disabled:opacity-50 ${
             error ? 'border-red-500' : 'border-gray-700 hover:border-gray-600'

@@ -82,6 +82,10 @@ export const strings = {
 
     fieldEmail:             'Email address',
     fieldPassword:          'Password',
+    passwordPlaceholder:    'Enter your password',
+    fieldConfirmPassword:   'Confirm password',
+    confirmPasswordPlaceholder: 'Re-enter your password',
+    validPasswordsDoNotMatch: 'Passwords do not match.',
     fieldName:              'Full name',
     actionSubmit:           'Submit',
     passwordRuleLength: 'Password must be at least 8 characters',
@@ -333,6 +337,10 @@ export const strings = {
 
     validEmailRequired:     'እባክዎ ትክክለኛ ኢሜይል አድራሻ ያስገቡ።',
     fieldPassword:          'የይለፍ ቃል',
+    passwordPlaceholder:    'የይለፍ ቃልዎን ያስገቡ', // needs native review
+    fieldConfirmPassword:   'የይለፍ ቃሉን ያረጋግጡ', // needs native review
+    confirmPasswordPlaceholder: 'የይለፍ ቃልዎን እንደገና ያስገቡ', // needs native review
+    validPasswordsDoNotMatch: 'የይለፍ ቃሎቹ አይዛመዱም።', // needs native review
     fieldName:              'ሙሉ ስም',
     actionSubmit:           'አስገባ',
     statusPleaseWait:       'እባክዎ ይጠብቁ…',
