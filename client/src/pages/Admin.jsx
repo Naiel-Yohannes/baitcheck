@@ -176,18 +176,6 @@ export default function Admin() {
   return (
     <main className="mx-auto w-full max-w-6xl px-2 py-4 sm:px-0 sm:py-6">
       <h1 className="mb-6 text-3xl font-bold tracking-tight text-white">{t('headingAdmin')}</h1>
-      <section className="mb-6 rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/70 to-slate-900 p-5 shadow-lg sm:p-6">
-        <h2 className="break-words font-mono text-2xl font-bold text-white">{summary.org?.name}</h2>
-        <p className="mt-2 text-sm text-slate-300">{t('adminJoinCodeHelp')}</p>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-          <p className="min-w-0 flex-1 select-text break-all rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 font-mono text-2xl font-bold tracking-widest text-violet-200 sm:text-3xl">{summary.org?.joinCode}</p>
-          <button type="button" onClick={copyJoinCode} className="min-h-11 shrink-0 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{copied ? t('adminCopied') : t('adminCopyCode')}</button>
-        </div>
-        <div className="mt-4 flex gap-2">
-          <button type="button" onClick={handleRotate} disabled={rotatePending} className="min-h-11 rounded-xl bg-rose-600 px-5 py-2.5 font-semibold text-white hover:bg-rose-500">{t('adminGenerateNewCode')}</button>
-          <button type="button" onClick={exportCSV} className="min-h-11 rounded-xl bg-emerald-600 px-5 py-2.5 font-semibold text-white hover:bg-emerald-500">{t('adminExportCSV')}</button>
-        </div>
-      </section>
 
       <nav className="mb-6 flex space-x-4" role="tablist">
         <button role="tab" aria-selected={activeTab==='overview'} onClick={() => setActiveTab('overview')} className={`px-3 py-2 rounded ${activeTab==='overview' ? 'bg-violet-600 text-white' : 'bg-slate-800 text-slate-300'}`}>{t('adminTabOverview')}</button>
@@ -285,7 +273,18 @@ export default function Admin() {
       {activeTab === 'settings' && (
         <section>
           <h2 className="mb-4 text-xl font-semibold text-white">{t('adminSettings')}</h2>
-          {/* Additional settings could be added here */}
+          <div className="rounded-2xl border border-violet-500/30 bg-gradient-to-br from-violet-950/70 to-slate-900 p-5 shadow-lg sm:p-6">
+            <h3 className="break-words font-mono text-2xl font-bold text-white">{summary.org?.name}</h3>
+            <p className="mt-2 text-sm text-slate-300">{t('adminJoinCodeHelp')}</p>
+            <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <p className="min-w-0 flex-1 select-text break-all rounded-xl border border-slate-700 bg-slate-950/80 px-4 py-3 font-mono text-2xl font-bold tracking-widest text-violet-200 sm:text-3xl">{summary.org?.joinCode}</p>
+              <button type="button" onClick={copyJoinCode} className="min-h-11 shrink-0 rounded-xl bg-violet-600 px-5 py-2.5 font-semibold text-white hover:bg-violet-500">{copied ? t('adminCopied') : t('adminCopyCode')}</button>
+            </div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button type="button" onClick={handleRotate} disabled={rotatePending} className="min-h-11 rounded-xl bg-rose-600 px-5 py-2.5 font-semibold text-white hover:bg-rose-500">{t('adminGenerateNewCode')}</button>
+              <button type="button" onClick={exportCSV} className="min-h-11 rounded-xl bg-emerald-600 px-5 py-2.5 font-semibold text-white hover:bg-emerald-500">{t('adminExportCSV')}</button>
+            </div>
+          </div>
         </section>
       )}
     </main>
